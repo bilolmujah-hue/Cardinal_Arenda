@@ -1,30 +1,39 @@
 # config.py
+import os
 
 # ============================================================
-# BOT & ADMIN SOZLAMALARI
+# BOT SOZLAMALARI
 # ============================================================
 class BOT:
     TOKEN = "8661307249:AAH1d8VDMAR1uAcK5_2hzSPnf2QqNtEGtO8"
     ADMIN_ID = 7038296036
+    # Railway'dan URL olganingizdan keyin shu yerga yozasiz (hozircha test uchun)
     WEBAPP_URL = "https://your-railway-url.up.railway.app/webapp/index.html"
-    USERBOT_WATCH = "CardXabarBot" # To'lovlarni kuzatuvchi bot
+    USERBOT_WATCH = "CardXabarBot"
+    VIDEO_CHANNEL_ID = -1004401093865 # Video saqlanadigan kanal (o'zingiznikini qo'ying)
 
+# ============================================================
+# DATABASE (RAILWAY MA'LUMOTLARI ASOSIDA)
+# ============================================================
 class DB:
-    # Railway yoki lokal PostgreSQL
-    HOST = "localhost"
+    # Agar o'z kompyuteringizda ishlatsangiz, HOST ni "containers-us-west-xxx.railway.app" kabi public manzilga o'zgartiring
+    HOST = "postgres.railway.internal"
     PORT = 5432
-    NAME = "cardinal_db"
+    NAME = "railway"
     USER = "postgres"
-    PASSWORD = "root"
+    PASSWORD = "jkxPwUODAplwALIVsDeCBwrcqGx2EfL"
 
+# ============================================================
+# JWT (XAVFSIZLIK)
+# ============================================================
 class JWT:
-    SECRET = "Cardinal_Arenda_Super_Secret_2026_Mukammal"
+    SECRET = "Cardinal_Arenda_Super_Secret_Key_2026_Mukammal"
     ALGORITHM = "HS256"
     ACCESS_MINUTES = 60
     REFRESH_DAYS = 7
 
 # ============================================================
-# PREMIUM EMOJILAR (Aiogram uchun)
+# PREMIUM EMOJILAR (Aiogram 3 uchun)
 # ============================================================
 PREMIUM_EMOJI = {
     "✔️": "5206607081334906820",
@@ -80,14 +89,4 @@ PREMIUM_EMOJI = {
     "🏠": "5416041192905265756",
     "⚡️": "5456140674028019486",
     "✅": "5895628223407984747",
-}
-
-# ============================================================
-# GALICHKALAR (Checkmarks) SOZLAMALARI
-# ============================================================
-CHECKMARKS = {
-    "none": "",
-    "blue": "🔵",   # Admin tasdiqlagan profil
-    "yellow": "🟡", # 1 hafta top
-    "black": "⚫️"   # Butunlay top
 }
