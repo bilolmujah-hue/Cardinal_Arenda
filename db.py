@@ -2,6 +2,7 @@
 import asyncpg
 import json
 import logging
+import os
 from datetime import datetime, timedelta
 from config import DB
 
@@ -13,12 +14,30 @@ class Database:
         self.pool = None
 
     async def connect(self):
-        self.pool = await asyncpg.create_pool(
-            host=DB.HOST, port=DB.PORT, database=DB.NAME,
-            user=DB.USER, password=DB.PASSWORD,
-            min_size=5, max_size=20
-        )
-        logger.info("✅ PostgreSQL ulandi")
+        # Railway avtomatik beradigan DATABASE_URL ni tekshiramiz
+        db_url = os.getenv("DATABASE_URL")
+
+        # Agar Railway'da bo'lsa, shu orqali ulanadi (xatosiz usul)
+        if db_url:
+            # asyncpg ba'zan postgres:// ni tushunmaydi, postgresql:// ga o'zgartiramiz
+            if db_url.startswith("postgres://"):
+                db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+            logger.info("🌐 Railway DATABASE_URL orqali ulanmoqda...")
+            self.pool = await asyncpg.create_pool(
+                dsn=db_url,
+                min_size=5, max_size=20
+            )
+        else:
+            # O'z kompyuterda test qilish uchun config.py dan oladi
+            logger.info("💻 Lokal config.py orqali ulanmoqda...")
+            self.pool = await asyncpg.create_pool(
+                host=DB.HOST, port=DB.PORT, database=DB.NAME,
+                user=DB.USER, password=DB.PASSWORD,
+                min_size=5, max_size=20
+            )
+
+        logger.info("✅ PostgreSQL ulandi!")
         await self.create_tables()
 
     async def close(self):
@@ -58,12 +77,12 @@ class Database:
                             ),
                                 balance BIGINT DEFAULT 0,
                                 is_admin BOOLEAN DEFAULT FALSE,
-                                is_verified BOOLEAN DEFAULT FALSE, -- Ko'k galichka
+                                is_verified BOOLEAN DEFAULT FALSE,
                                 checkmark_type VARCHAR
                             (
                                 20
-                            ) DEFAULT 'none', -- yellow, black
-                                passport_file_id TEXT, -- Admin yuklagan pasport
+                            ) DEFAULT 'none',
+                                passport_file_id TEXT,
                                 is_blocked BOOLEAN DEFAULT FALSE,
                                 created_at TIMESTAMP DEFAULT NOW
                             (
@@ -71,7 +90,7 @@ class Database:
                                 );
                             """)
 
-            # 2. AKKOUNTLAR (PUBG)
+            # 2. AKKOUNTLAR
             await c.execute("""
                             CREATE TABLE IF NOT EXISTS accounts
                             (
@@ -83,15 +102,15 @@ class Database:
                                 VARCHAR
                             (
                                 50
-                            ) UNIQUE NOT NULL, -- #1, #2
+                            ) UNIQUE NOT NULL,
                                 account_type VARCHAR
                             (
                                 20
-                            ) DEFAULT 'webapp', -- webapp yoki bot
-                                video_msg_id TEXT, -- Telegram kanaldagi video ID
-                                image_url TEXT, -- Rasm (WebApp uchun)
-                                details_text TEXT, -- Qatorma-qator yozilgan ma'lumot
-                                prices_json JSONB DEFAULT '{}'::jsonb, -- {"2": 25000, "night": 50000}
+                            ) DEFAULT 'webapp',
+                                video_msg_id TEXT,
+                                image_url TEXT,
+                                details_text TEXT,
+                                prices_json JSONB DEFAULT '{}'::jsonb,
                                 is_active BOOLEAN DEFAULT TRUE,
                                 created_at TIMESTAMP DEFAULT NOW
                             (
@@ -122,14 +141,14 @@ class Database:
                                 duration_type VARCHAR
                             (
                                 20
-                            ), -- "2", "6", "night"
+                            ),
                                 price BIGINT NOT NULL,
                                 start_time TIMESTAMP,
                                 end_time TIMESTAMP,
                                 status VARCHAR
                             (
                                 20
-                            ) DEFAULT 'pending', -- pending, active, completed, rejected
+                            ) DEFAULT 'pending',
                                 reject_reason TEXT,
                                 created_at TIMESTAMP DEFAULT NOW
                             (
@@ -156,7 +175,7 @@ class Database:
                                 type VARCHAR
                             (
                                 20
-                            ) NOT NULL, -- topup, rent, refund
+                            ) NOT NULL,
                                 description TEXT,
                                 status VARCHAR
                             (
@@ -168,7 +187,7 @@ class Database:
                                 );
                             """)
 
-            # 5. TO'LOV SO'ROVLARI (CardXabarBot uchun)
+            # 5. TO'LOV SO'ROVLARI
             await c.execute("""
                             CREATE TABLE IF NOT EXISTS topup_requests
                             (
@@ -191,7 +210,7 @@ class Database:
                                 status VARCHAR
                             (
                                 30
-                            ) DEFAULT 'WAITING', -- WAITING, MATCHED, RECEIPT, COMPLETED, EXPIRED
+                            ) DEFAULT 'WAITING',
                                 expires_at TIMESTAMP NOT NULL,
                                 receipt_url TEXT,
                                 created_at TIMESTAMP DEFAULT NOW
@@ -200,7 +219,7 @@ class Database:
                                 );
                             """)
 
-            # 6. REYTING (Top 50 uchun)
+            # 6. REYTING
             await c.execute("""
                             CREATE TABLE IF NOT EXISTS ratings
                             (
@@ -218,8 +237,8 @@ class Database:
                                 timeframe VARCHAR
                             (
                                 20
-                            ), -- week, month, all_time
-                                score BIGINT DEFAULT 0, -- Qancha pul to'lagan
+                            ),
+                                score BIGINT DEFAULT 0,
                                 updated_at TIMESTAMP DEFAULT NOW
                             (
                             ),
@@ -231,7 +250,7 @@ class Database:
                                 );
                             """)
 
-            # 7. SOZLAMALAR (Kartalar, Kanallar, Sovg'alar)
+            # 7. SOZLAMALAR
             await c.execute("""
                             CREATE TABLE IF NOT EXISTS settings
                             (
@@ -245,7 +264,7 @@ class Database:
                             """)
 
     # ============================================================
-    # FOYDALANUVCHI BILAN ISHLASH
+    # FOYDALANUVCHILAR
     # ============================================================
     async def get_user(self, tg_id: int):
         async with self.pool.acquire() as c:
@@ -273,12 +292,10 @@ class Database:
                                 VALUES ($1, $2, $3, $4)
                                 """, u['id'], amount, tx_type, desc)
 
-                # Reytingga qo'shish (faqat topup bo'lsa)
                 if tx_type == "topup":
                     await self._update_rating(c, u['id'], amount)
 
     async def _update_rating(self, conn, user_id, amount):
-        # Haftalik, Oylik va Butunlayga qo'shish
         for tf in ['week', 'month', 'all_time']:
             await conn.execute("""
                                INSERT INTO ratings (user_id, timeframe, score)
@@ -295,7 +312,7 @@ class Database:
             await c.execute("UPDATE users SET passport_file_id=$1, is_verified=TRUE WHERE tg_id=$2", file_id, tg_id)
 
     # ============================================================
-    # AKKOUNTLAR BILAN ISHLASH
+    # AKKOUNTLAR
     # ============================================================
     async def get_accounts(self, acc_type="webapp"):
         async with self.pool.acquire() as c:
@@ -311,21 +328,18 @@ class Database:
                             """, acc_name, acc_type, video_msg_id, image_url, details_text, json.dumps(prices_json))
 
     # ============================================================
-    # HARIDLAR BILAN ISHLASH (RENTALS)
+    # HARIDLAR
     # ============================================================
     async def create_rental(self, tg_id, account_id, duration_type, price):
         async with self.pool.acquire() as c:
             async with c.transaction():
                 u = await c.fetchrow("SELECT id FROM users WHERE tg_id=$1", tg_id)
-
-                # Pulni yechish
                 await c.execute("UPDATE users SET balance = balance - $1 WHERE id=$2", price, u['id'])
                 await c.execute("""
                                 INSERT INTO transactions (user_id, amount, type, description)
                                 VALUES ($1, $2, 'rent', 'Arenda to''lovi')
                                 """, u['id'], price)
 
-                # Haridni yaratish
                 rid = await c.fetchval("""
                                        INSERT INTO rentals (user_id, account_id, duration_type, price, status)
                                        VALUES ($1, $2, $3, $4, 'pending') RETURNING id
@@ -334,11 +348,9 @@ class Database:
 
     async def approve_rental(self, rental_id, start_time):
         async with self.pool.acquire() as c:
-            # Necha soat ekanligini aniqlash
             r = await c.fetchrow("SELECT duration_type FROM rentals WHERE id=$1", rental_id)
             hours = 24 if r['duration_type'] == 'night' else int(r['duration_type'])
 
-            # Agar tungi paket bo'lsa (21:00 - 08:00)
             if r['duration_type'] == 'night':
                 end_time = start_time + timedelta(hours=11)
             else:
@@ -356,7 +368,6 @@ class Database:
         async with self.pool.acquire() as c:
             async with c.transaction():
                 r = await c.fetchrow("SELECT user_id, price FROM rentals WHERE id=$1", rental_id)
-                # Pulni qaytarish
                 await c.execute("UPDATE users SET balance = balance + $1 WHERE id=$2", r['price'], r['user_id'])
                 await c.execute("""
                                 INSERT INTO transactions (user_id, amount, type, description)
@@ -387,5 +398,5 @@ class Database:
             return {"users": users, "active_rentals": active_rentals, "total_income": total_income}
 
 
-# Baza obyekti (boshqa fayllarda import qilish uchun)
+# Baza obyekti
 db = Database()
