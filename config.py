@@ -5,7 +5,7 @@ import os
 # BOT SOZLAMALARI
 # ============================================================
 class BOT:
-    TOKEN = "8661307249:AAH1d8VDMAR1uAcK5_2hzSPnf2QqNtEGtO8"
+    TOKEN = "8661307249:AAF4TeASW8PR5oygdo9eP_7xaJMy8h7gG6g"
     ADMIN_ID = 7038296036
     # Railway'dan URL olganingizdan keyin shu yerga yozasiz (hozircha test uchun)
     WEBAPP_URL = "https://your-railway-url.up.railway.app/webapp/index.html"
