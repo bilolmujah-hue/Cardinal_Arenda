@@ -511,4 +511,4 @@ async def start_api(bot_instance, userbot_instance):
     port = int(os.environ.get("PORT", 8080))
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    logger.info(f"🚀 API Server ishga tushdi: http://0.0.0.0:{port}")git push -u origin main
+    logger.info(f"🚀 API Server ishga tushdi: http://0.0.0.0:{port}")
