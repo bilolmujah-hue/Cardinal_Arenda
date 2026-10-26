@@ -15,67 +15,34 @@ from aiogram.types import (
 
 from config import BOT
 from db import db
+# MUAMMO SHU YERDA EDI:
+from userbot import CardXabarWatcher 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("CardinalBot")
 
 # ============================================================
-# PREMIUM EMOJILAR (Bot.py ichida)
+# PREMIUM EMOJILAR
 # ============================================================
 PREMIUM_EMOJI = {
-    "✔️": "5206607081334906820",
-    "❌": "5210952531676504517",
-    "⌛️": "5296482716567495148",
-    "⚠️": "5447644880824181073",
-    "1️⃣": "5382322671679708881",
-    "2️⃣": "5381990043642502553",
-    "3️⃣": "5381879959335738545",
-    "4️⃣": "5382054253403577563",
-    "✨": "5325547803936572038",
-    "🚫": "5240241223632954241",
-    "🟢": "5832572966721818453",
-    "🔴": "5411225014148014586",
-    "▶️": "5348125953090403204",
-    "⏳": "5368380585066665290",
-    "⛔️": "5370675038200541160",
-    "👤": "5879770735999717115",
-    "👥": "5372926953978341366",
-    "🔤": "5841276284155467413",
-    "🧾": "5444856076954520455",
-    "🖥": "5282843764451195532",
-    "📱": "5355116622250026900",
-    "📞": "5467539229468793355",
-    "📲": "5406809207947142040",
-    "🔗": "5271604874419647061",
-    "❤️": "5354817009626425681",
-    "👑": "5217822164362739968",
-    "👋": "5413694143601842851",
-    "🎮": "5361741454685256344",
-    "📌": "5397782960512444700",
-    "🌐": "5447410659077661506",
-    "📢": "5278256077954105203",
-    "💳": "5445353829304387411",
-    "ℹ️": "5334544901428229844",
-    "🛡": "5251203410396458957",
-    "🤖": "5287684458881756303",
-    "🗓": "5413879192267805083",
-    "📁": "5336899419679792193",
-    "📊": "5231200819986047254",
-    "💰": "5224257782013769471",
-    "💸": "5231449120635370684",
-    "💵": "5409048419211682843",
-    "➕": "5397916757333654639",
-    "🎬": "5375464961822695044",
-    "🛒": "5312361253610475399",
-    "🏆": "5226431245918942763",
-    "🎯": "5256131095094652290",
-    "🚗": "5233638613358486264",
-    "🔫": "5192724084881892602",
-    "💎": "5427168083074628963",
-    "📍": "5391032818111363540",
-    "🏠": "5416041192905265756",
-    "⚡️": "5456140674028019486",
-    "✅": "5895628223407984747",
+    "✔️": "5206607081334906820", "❌": "5210952531676504517", "⌛️": "5296482716567495148",
+    "⚠️": "5447644880824181073", "1️⃣": "5382322671679708881", "2️⃣": "5381990043642502553",
+    "3️⃣": "5381879959335738545", "4️⃣": "5382054253403577563", "✨": "5325547803936572038",
+    "🚫": "5240241223632954241", "🟢": "5832572966721818453", "🔴": "5411225014148014586",
+    "▶️": "5348125953090403204", "⏳": "5368380585066665290", "⛔️": "5370675038200541160",
+    "👤": "5879770735999717115", "👥": "5372926953978341366", "🔤": "5841276284155467413",
+    "🧾": "5444856076954520455", "🖥": "5282843764451195532", "📱": "5355116622250026900",
+    "📞": "5467539229468793355", "📲": "5406809207947142040", "🔗": "5271604874419647061",
+    "❤️": "5354817009626425681", "👑": "5217822164362739968", "👋": "5413694143601842851",
+    "🎮": "5361741454685256344", "📌": "5397782960512444700", "🌐": "5447410659077661506",
+    "📢": "5278256077954105203", "💳": "5445353829304387411", "ℹ️": "5334544901428229844",
+    "🛡": "5251203410396458957", "🤖": "5287684458881756303", "🗓": "5413879192267805083",
+    "📁": "5336899419679792193", "📊": "5231200819986047254", "💰": "5224257782013769471",
+    "💸": "5231449120635370684", "💵": "5409048419211682843", "➕": "5397916757333654639",
+    "🎬": "5375464961822695044", "🛒": "5312361253610475399", "🏆": "5226431245918942763",
+    "🎯": "5256131095094652290", "🚗": "5233638613358486264", "🔫": "5192724084881892602",
+    "💎": "5427168083074628963", "📍": "5391032818111363540", "🏠": "5416041192905265756",
+    "⚡️": "5456140674028019486", "✅": "5895628223407984747",
 }
 
 _EMOJI_KEYS = sorted(PREMIUM_EMOJI.keys(), key=len, reverse=True)
@@ -92,10 +59,14 @@ def pe(text: str) -> str:
     return _EMOJI_PATTERN.sub(repl, text)
 
 # ============================================================
-# BOT & DISPATCHER
+# BOT & DISPATCHER & USERBOT (Tuzatildi)
 # ============================================================
 bot = Bot(token=BOT.TOKEN, parse_mode="HTML")
 dp = Dispatcher()
+
+# MANA BU QATOR YETISHMAYOTGAN EDI:
+userbot = CardXabarWatcher(db=db, bot=bot) 
+
 
 # ============================================================
 # FSM STATES
@@ -207,7 +178,6 @@ async def process_acc_name(message: types.Message, state: FSMContext):
 
 @dp.message(AdminStates.add_acc_video, F.video)
 async def process_acc_video(message: types.Message, state: FSMContext):
-    # Videoni kanalga saqlash
     try:
         saved_msg = await message.forward(BOT.VIDEO_CHANNEL_ID)
         await state.update_data(video_msg_id=saved_msg.message_id)
@@ -219,7 +189,7 @@ async def process_acc_video(message: types.Message, state: FSMContext):
 
 @dp.message(AdminStates.add_acc_text)
 async def process_acc_text(message: types.Message, state: FSMContext):
-    await state.update_data(details_text=message.html_text) # Premium emojilarni saqlash uchun html_text
+    await state.update_data(details_text=message.html_text)
     await message.answer(pe("💰 Endi narxlarni kiriting:\n\nMasalan:\n2 - 25000\n6 - 49000\nnight - 50000"))
     await state.set_state(AdminStates.add_acc_prices)
 
@@ -227,7 +197,6 @@ async def process_acc_text(message: types.Message, state: FSMContext):
 async def process_acc_prices(message: types.Message, state: FSMContext):
     data = await state.get_data()
     
-    # Narxlarni parse qilish
     prices = {}
     lines = message.text.split("\n")
     for line in lines:
@@ -275,7 +244,6 @@ async def send_rental_to_admin(rental_id, user_id, user_name, acc_name, duration
 async def admin_approve_rent(cb: types.CallbackQuery):
     rental_id = int(cb.data.split("_")[-1])
     
-    # 2-qadam: Akkountni ulab berdim va User tasdiqlash
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔗 Akkount ulab berdim", callback_data=f"linked_acc_{rental_id}")],
         [InlineKeyboardButton(text="👤 User tasdiqlash (Pasport)", callback_data=f"verify_user_{rental_id}")]
@@ -292,7 +260,6 @@ async def admin_linked_acc(cb: types.CallbackQuery):
     
     await cb.message.edit_text(pe("✅ <b>Akkount ulab berildi!</b>\n\nVaqt avtomatik boshlandi."))
     
-    # Foydalanuvchiga xabar
     async with db.pool.acquire() as conn:
         r = await conn.fetchrow("SELECT u.tg_id, a.acc_name FROM rentals r JOIN users u ON u.id=r.user_id JOIN accounts a ON a.id=r.account_id WHERE r.id=$1", rental_id)
         if r:
@@ -313,12 +280,10 @@ async def process_passport(message: types.Message, state: FSMContext):
     photo_id = message.photo[-1].file_id
     
     async with db.pool.acquire() as conn:
-        # User ID ni topish
         r = await conn.fetchrow("SELECT user_id FROM rentals WHERE id=$1", rental_id)
         if r:
             await conn.execute("UPDATE users SET passport_file_id=$1, is_verified=TRUE, checkmark_type='blue' WHERE id=$2", photo_id, r['user_id'])
             
-            # Foydalanuvchiga xabar
             u = await conn.fetchrow("SELECT tg_id FROM users WHERE id=$1", r['user_id'])
             if u:
                 await bot.send_message(u['tg_id'], pe("✅ <b>Profilingiz admin tomonidan tasdiqlandi!</b>\nSizga ko'k galichka berildi."))
@@ -328,7 +293,7 @@ async def process_passport(message: types.Message, state: FSMContext):
 
 
 # ============================================================
-# BOTNI ISHGA TUSHIRISH (main.py dan chaqiriladi)
+# BOTNI ISHGA TUSHIRISH
 # ============================================================
 async def start_bot():
     logger.info("🚀 Bot ishga tushdi...")
