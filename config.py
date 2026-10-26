@@ -8,7 +8,7 @@ class BOT:
     TOKEN = "8661307249:AAF4TeASW8PR5oygdo9eP_7xaJMy8h7gG6g"
     ADMIN_ID = 7038296036
     # Railway'dan URL olganingizdan keyin shu yerga yozasiz (hozircha test uchun)
-    WEBAPP_URL = "https://your-railway-url.up.railway.app/webapp/index.html"
+    WEBAPP_URL = "https://bilolmujah-hue.github.io/Cardinal_Arenda/"
     USERBOT_WATCH = "CardXabarBot"
     VIDEO_CHANNEL_ID = -1004401093865 # Video saqlanadigan kanal (o'zingiznikini qo'ying)
 
