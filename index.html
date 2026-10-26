@@ -8,11 +8,11 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         /* ============================================================
-           1. GLOBAL SOZLAMALAR VA O'ZGARUVCHILAR (VARIABLES)
+           1. GLOBAL SOZLAMALAR VA VARIABLES
            ============================================================ */
         :root {
             --bg: #F5F7FB;
@@ -28,11 +28,14 @@
             --danger: #EF4444;
             --warning: #F59E0B;
             --gold: #FCD34D;
+            --silver: #CBD5E1;
+            --bronze: #B45309;
             --border: rgba(15, 23, 42, 0.08);
-            --shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
-            --shadow-lg: 0 15px 40px rgba(15, 23, 42, 0.12);
-            --radius: 20px;
+            --shadow-sm: 0 4px 6px rgba(15, 23, 42, 0.04);
+            --shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 15px 40px rgba(15, 23, 42, 0.15);
             --radius-sm: 12px;
+            --radius: 20px;
             --radius-lg: 28px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -45,6 +48,7 @@
             --text: #F8FAFC;
             --text-muted: #94A3B8;
             --border: rgba(148, 163, 184, 0.1);
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.2);
             --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
             --shadow-lg: 0 15px 40px rgba(0, 0, 0, 0.6);
         }
@@ -71,13 +75,43 @@
             min-height: 100vh;
         }
 
-        /* Scrollbar */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 10px; }
 
         /* ============================================================
-           2. SPLASH SCREEN VA ANIMATSIYALAR
+           2. ANIMATSIYALAR (KEYFRAMES)
+           ============================================================ */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        @keyframes ripple {
+            to { transform: scale(4); opacity: 0; }
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.1); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            70% { transform: scale(1); }
+        }
+
+        /* ============================================================
+           3. SPLASH SCREEN VA SKELETON LOADER
            ============================================================ */
         #splash {
             position: fixed;
@@ -88,16 +122,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.6s ease, visibility 0.6s;
+            transition: opacity 0.5s ease, visibility 0.5s;
         }
-
         #splash.hide {
             opacity: 0;
             visibility: hidden;
         }
-
         .splash-logo {
-            font-size: 38px;
+            font-size: 42px;
             font-weight: 800;
             letter-spacing: 0.1em;
             background: linear-gradient(135deg, #3B82F6, #06B6D4);
@@ -105,57 +137,40 @@
             -webkit-text-fill-color: transparent;
             animation: pulse 2s infinite;
         }
-
         .splash-sub {
             margin-top: 10px;
             font-size: 14px;
             color: var(--text-muted);
-            letter-spacing: 0.3em;
+            letter-spacing: 0.4em;
             text-transform: uppercase;
-            animation: fadeIn 1.5s ease;
         }
-
-        .loader-bar {
+        .splash-loader {
             margin-top: 40px;
-            width: 150px;
-            height: 3px;
+            width: 120px;
+            height: 4px;
             background: var(--surface-hover);
             border-radius: 10px;
             overflow: hidden;
             position: relative;
         }
-
-        .loader-bar::after {
+        .splash-loader::after {
             content: '';
             position: absolute;
             inset: 0;
-            width: 50%;
+            width: 40%;
             background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: loading 1.5s infinite linear;
+            animation: shimmer 1.5s infinite linear;
         }
 
-        @keyframes loading {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(200%); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hover) 50%, var(--surface) 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
+            border-radius: var(--radius-sm);
         }
 
         /* ============================================================
-           3. HEADER VA NAVIGATSIYA
+           4. HEADER (YUQORI QISM)
            ============================================================ */
         .header {
             position: sticky;
@@ -178,29 +193,29 @@
             gap: 12px;
         }
 
-        .avatar {
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), #06B6D4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            font-weight: 800;
+        .avatar-container {
             position: relative;
-            box-shadow: 0 4px 15px var(--primary-glow);
+            width: 48px;
+            height: 48px;
         }
 
-        .avatar img {
+        .avatar {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid transparent;
+            background: var(--surface-hover);
         }
 
-        .avatar-badge {
+        /* Galichkalar (Border orqali) */
+        .avatar.verified-blue { border-color: #3B82F6; box-shadow: 0 0 10px rgba(59,130,246,0.5); }
+        .avatar.verified-yellow { border-color: #F59E0B; box-shadow: 0 0 10px rgba(245,158,11,0.5); }
+        .avatar.verified-black { border-color: #0F172A; box-shadow: 0 0 10px rgba(15,23,42,0.8); }
+        
+        body.dark .avatar.verified-black { border-color: #F8FAFC; box-shadow: 0 0 10px rgba(248,250,252,0.8); }
+
+        .badge-icon {
             position: absolute;
             bottom: -2px;
             right: -2px;
@@ -213,22 +228,30 @@
             justify-content: center;
             font-size: 10px;
             color: white;
+            z-index: 2;
         }
-
-        .badge-blue { background: #3B82F6; }
-        .badge-yellow { background: #F59E0B; }
-        .badge-black { background: #0F172A; }
+        .b-blue { background: #3B82F6; }
+        .b-yellow { background: #F59E0B; }
+        .b-black { background: #0F172A; }
 
         .user-info h2 {
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .user-info p {
             font-size: 13px;
-            color: var(--success);
+            color: var(--text-muted);
             font-weight: 600;
             margin-top: 2px;
+        }
+
+        .user-info p span {
+            color: var(--success);
+            font-weight: 800;
         }
 
         .theme-toggle {
@@ -243,15 +266,11 @@
             cursor: pointer;
             transition: var(--transition);
             color: var(--text);
-        }
-
-        .theme-toggle svg {
-            width: 22px;
-            height: 22px;
+            box-shadow: var(--shadow-sm);
         }
 
         /* ============================================================
-           4. ASOSIY KONTENT (PAGES)
+           5. ASOSIY KONTENT (PAGES)
            ============================================================ */
         .container {
             padding: 20px;
@@ -269,17 +288,17 @@
         }
 
         .section-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             margin-top: 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         /* ============================================================
-           5. AKKOUNTLAR KARTOCHKASI
+           6. AKKOUNTLAR (KARTOCHKALAR)
            ============================================================ */
         .accounts-grid {
             display: flex;
@@ -301,15 +320,32 @@
             transform: scale(0.98);
         }
 
-        .acc-image {
+        .acc-media-container {
+            position: relative;
             width: 100%;
             height: 200px;
-            object-fit: cover;
             background: #000;
-            display: block;
         }
 
-        .acc-status-badge {
+        .acc-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .account-card:hover .play-overlay { opacity: 1; }
+
+        .status-badge {
             position: absolute;
             top: 16px;
             right: 16px;
@@ -319,19 +355,11 @@
             font-weight: 800;
             text-transform: uppercase;
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 10;
         }
 
-        .status-free {
-            background: rgba(16, 185, 129, 0.9);
-            color: white;
-        }
-
-        .status-busy {
-            background: rgba(239, 68, 68, 0.9);
-            color: white;
-        }
+        .status-free { background: rgba(16, 185, 129, 0.9); color: white; }
+        .status-busy { background: rgba(239, 68, 68, 0.9); color: white; }
 
         .acc-content {
             padding: 20px;
@@ -347,18 +375,10 @@
         .acc-title {
             font-size: 20px;
             font-weight: 800;
+            color: var(--text);
         }
 
-        .acc-price {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--primary);
-            background: rgba(59, 130, 246, 0.1);
-            padding: 4px 12px;
-            border-radius: 10px;
-        }
-
-        .acc-details {
+        .acc-details-text {
             font-size: 14px;
             color: var(--text-muted);
             line-height: 1.6;
@@ -372,13 +392,15 @@
             border-radius: var(--radius);
             border: none;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-primary {
@@ -393,334 +415,25 @@
             background: var(--surface-hover);
             color: var(--text-muted);
             cursor: not-allowed;
-            box-shadow: none;
         }
 
-        /* ============================================================
-           6. BALANS TO'LDIRISH (TOPUP)
-           ============================================================ */
-        .topup-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .input-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 18px;
-            background: var(--bg);
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--text);
-            text-align: center;
-            transition: var(--transition);
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        .bonus-info {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 12px 16px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: var(--success);
-            font-weight: 600;
-        }
-
-        .quick-amounts {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .quick-btn {
-            padding: 12px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-weight: 700;
-            color: var(--text);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .quick-btn:active { background: var(--primary); color: white; }
-
-        .payment-info {
-            display: none;
-            animation: slideUp 0.4s ease;
-        }
-
-        .card-display {
-            background: linear-gradient(135deg, #1E293B, #0F172A);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            color: white;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .card-display::before {
-            content: '';
+        /* Ripple Effect */
+        .ripple {
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
-        }
-
-        .card-number {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin: 15px 0;
-            color: #93C5FD;
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .card-holder {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #94A3B8;
-        }
-
-        .timer-box {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .timer-display {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--primary);
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .timer-display.warning { color: var(--danger); animation: pulse 1s infinite; }
-
-        /* ============================================================
-           7. REYTING (TOP 50)
-           ============================================================ */
-        .rating-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-        }
-
-        .rating-tab {
-            padding: 10px 20px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 14px;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--text-muted);
-        }
-
-        .rating-tab.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .rating-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .rating-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        .rating-rank {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text-muted);
-            width: 30px;
-            text-align: center;
-        }
-
-        .rank-1 { color: #FCD34D; font-size: 24px; }
-        .rank-2 { color: #CBD5E1; font-size: 24px; }
-        .rank-3 { color: #B45309; font-size: 24px; }
-
-        .rating-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--surface-hover);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .rating-name {
-            flex: 1;
-            font-weight: 700;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .rating-score {
-            font-weight: 800;
-            color: var(--primary);
-            font-size: 15px;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
         }
 
         /* ============================================================
-           8. HARIDLARIM (RENTALS)
+           7. MODAL OYNALAR (PASTDAN CHIQADIGAN)
            ============================================================ */
-        .rental-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: var(--shadow);
-        }
-
-        .rental-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .rental-title {
-            font-size: 16px;
-            font-weight: 800;
-        }
-
-        .rental-status {
-            font-size: 12px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 8px;
-            text-transform: uppercase;
-        }
-
-        .st-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .st-active { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .st-completed { background: rgba(100, 116, 139, 0.1); color: var(--text-muted); }
-        .st-rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-
-        .rental-time {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 10px;
-            background: var(--bg);
-            padding: 10px;
-            border-radius: var(--radius-sm);
-        }
-
-        /* ============================================================
-           9. PASTKI NAVIGATSIYA (BOTTOM NAV)
-           ============================================================ */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 10px;
-            padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-            border-top: 1px solid var(--border);
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-muted);
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            width: 60px;
-        }
-
-        .nav-item svg {
-            width: 24px;
-            height: 24px;
-            stroke-width: 2.2;
-            transition: var(--transition);
-        }
-
-        .nav-item.active {
-            color: var(--primary);
-        }
-
-        .nav-item.active svg {
-            transform: translateY(-3px);
-            filter: drop-shadow(0 4px 6px var(--primary-glow));
-        }
-
-        /* ============================================================
-           10. MODAL OYNALAR VA TOAST
-           ============================================================ */
-        .modal {
+        .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(5px);
             z-index: 2000;
             display: flex;
@@ -731,7 +444,7 @@
             transition: var(--transition);
         }
 
-        .modal.active {
+        .modal-overlay.active {
             opacity: 1;
             visibility: visible;
         }
@@ -745,10 +458,20 @@
             padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .modal.active .modal-content {
+        .modal-overlay.active .modal-content {
             transform: translateY(0);
+        }
+
+        .modal-drag-handle {
+            width: 40px;
+            height: 4px;
+            border-radius: 10px;
+            background: var(--border);
+            margin: 0 auto 20px;
         }
 
         .modal-header {
@@ -763,21 +486,309 @@
             font-weight: 800;
         }
 
-        .close-modal {
+        .close-btn {
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: var(--bg);
+            background: var(--surface-hover);
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text);
             cursor: pointer;
+            font-size: 18px;
         }
 
+        /* To'lov usullari */
+        .price-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .price-option:hover { border-color: var(--primary); }
+        .price-option.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.05); }
+
+        /* ============================================================
+           8. BALANS TO'LDIRISH (TOPUP)
+           ============================================================ */
+        .topup-input-container {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        .topup-input-container:focus-within { border-color: var(--primary); }
+
+        .topup-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text);
+            text-align: center;
+            font-family: 'Space Grotesk', sans-serif;
+            outline: none;
+        }
+
+        .quick-amounts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-btn {
+            padding: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            color: var(--text);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .quick-btn:active { background: var(--primary); color: white; }
+
+        .bonus-alert {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Karta va Taymer */
+        .card-visual {
+            background: linear-gradient(135deg, #1E293B, #0F172A);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            color: white;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .card-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 200px; height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        .card-num {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #93C5FD;
+            margin: 15px 0;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .timer-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .timer-text {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .timer-text.warning { color: var(--danger); animation: pulse 1s infinite; }
+
+        /* ============================================================
+           9. REYTING (TOP 50)
+           ============================================================ */
+        .rating-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--surface);
+            padding: 6px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        .rating-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .rating-tab.active { background: var(--primary); color: white; }
+
+        /* Podium Top 3 */
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            width: 90px;
+        }
+        .podium-avatar {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--border);
+            margin-bottom: 10px;
+            object-fit: cover;
+            box-shadow: var(--shadow);
+        }
+        .podium-name { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+        .podium-score { font-size: 11px; color: var(--primary); font-weight: 700; }
+        
+        .podium-1 { order: 2; }
+        .podium-1 .podium-avatar { width: 80px; height: 80px; border-color: var(--gold); box-shadow: 0 0 20px rgba(252, 211, 77, 0.4); }
+        .podium-2 { order: 1; }
+        .podium-2 .podium-avatar { border-color: var(--silver); }
+        .podium-3 { order: 3; }
+        .podium-3 .podium-avatar { border-color: var(--bronze); }
+
+        .rating-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+        }
+        .rank-num { font-size: 16px; font-weight: 800; color: var(--text-muted); width: 30px; }
+        .rank-avatar { width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; object-fit: cover; }
+        .rank-name { flex: 1; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .rank-score { font-size: 14px; font-weight: 800; color: var(--primary); }
+
+        /* ============================================================
+           10. PROFIL VA ADMIN
+           ============================================================ */
+        .profile-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .profile-avatar-large {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+        .profile-name { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+        .profile-id { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-family: monospace; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-box {
+            background: var(--bg);
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        .stat-val { font-size: 20px; font-weight: 800; color: var(--text); }
+        .stat-lbl { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+
+        /* Admin Panel */
+        .admin-panel { display: none; }
+        .admin-panel.active { display: block; animation: fadeIn 0.3s; }
+
+        /* ============================================================
+           11. BOTTOM NAVIGATSIYA
+           ============================================================ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 10px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+            border-top: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 60px;
+            position: relative;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.2;
+            transition: var(--transition);
+        }
+
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active svg { transform: translateY(-2px); }
+
+        .nav-center-btn {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), #2563EB);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-top: -30px;
+            box-shadow: 0 8px 25px var(--primary-glow);
+            border: 4px solid var(--bg);
+        }
+        .nav-center-btn svg { width: 28px; height: 28px; stroke: white; }
+
         /* Toast Notification */
-        #toast-container {
+        .toast-container {
             position: fixed;
             top: 20px;
             left: 50%;
@@ -786,39 +797,25 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            width: 90%;
             pointer-events: none;
         }
-
         .toast {
             background: var(--surface);
             color: var(--text);
-            padding: 14px 24px;
-            border-radius: 50px;
-            font-weight: 600;
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            font-weight: 700;
             font-size: 14px;
             box-shadow: var(--shadow-lg);
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: slideDown 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            animation: slideUp 0.3s ease;
         }
-
-        .toast.success { border-left: 4px solid var(--success); }
-        .toast.error { border-left: 4px solid var(--danger); }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeOut {
-            to { opacity: 0; transform: translateY(-20px); }
-        }
-
-        /* Utility */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .mt-20 { margin-top: 20px; }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
     </style>
 </head>
 <body>
@@ -826,211 +823,251 @@
 <!-- SPLASH SCREEN -->
 <div id="splash">
     <div class="splash-logo">CARDINAL</div>
-    <div class="splash-sub">ARENDA</div>
-    <div class="loader-bar"></div>
+    <div class="splash-sub">MUKAMMAL ARENDA</div>
+    <div class="splash-loader"></div>
 </div>
 
-<!-- TOAST CONTAINER -->
-<div id="toast-container"></div>
+<!-- TOAST NOTIFICATIONS -->
+<div class="toast-container" id="toast-container"></div>
 
 <!-- HEADER -->
 <header class="header hidden" id="main-header">
     <div class="user-profile">
-        <div class="avatar" id="user-avatar">
-            C
-            <div class="avatar-badge badge-blue hidden" id="user-badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <div class="avatar-container" onclick="nav('page-profile', document.querySelectorAll('.nav-item')[4])">
+            <img id="user-avatar" class="avatar" src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff" alt="Avatar">
+            <!-- Galichka (Badge) -->
+            <div class="badge-icon b-blue hidden" id="user-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
         </div>
         <div class="user-info">
-            <h2 id="user-name">Foydalanuvchi</h2>
-            <p><span id="user-balance">0</span> so'm</p>
+            <h2 id="user-name">...</h2>
+            <p>Balans: <span id="user-balance">0</span> so'm</p>
         </div>
     </div>
-    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">
-        <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
     </button>
 </header>
 
-<!-- ============================================================ -->
-<!-- ASOSIY MENYU (AKKOUNTLAR) -->
-<!-- ============================================================ -->
+<!-- ========================================== -->
+<!-- 1. ASOSIY MENYU (AKKOUNTLAR) -->
+<!-- ========================================== -->
 <main class="container page active" id="page-main">
     <div class="section-title">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h.01M10 12h.01M14 12h.01M18 12h.01"></path></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h.01M10 12h.01M14 12h.01M18 12h.01"></path></svg>
         Mavjud Akkountlar
     </div>
+    
     <div class="accounts-grid" id="accounts-list">
-        <!-- JS orqali to'ldiriladi -->
+        <!-- Skeleton Loader -->
+        <div class="account-card">
+            <div class="acc-media-container skeleton"></div>
+            <div class="acc-content">
+                <div style="height:24px; width:50%; margin-bottom:12px;" class="skeleton"></div>
+                <div style="height:16px; width:100%; margin-bottom:16px;" class="skeleton"></div>
+                <div style="height:50px; width:100%;" class="skeleton"></div>
+            </div>
+        </div>
     </div>
 </main>
 
-<!-- ============================================================ -->
-<!-- BALANS TO'LDIRISH (TOPUP) -->
-<!-- ============================================================ -->
+<!-- ========================================== -->
+<!-- 2. BALANS TO'LDIRISH -->
+<!-- ========================================== -->
 <main class="container page" id="page-topup">
     <div class="section-title">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
         Hisobni To'ldirish
     </div>
 
     <div id="topup-form">
-        <div class="topup-card">
-            <label class="input-label">To'lov summasi (so'm)</label>
-            <div class="input-group">
-                <input type="number" class="input-field" id="topup-amount" placeholder="100000" oninput="calculateBonus()">
-            </div>
-            
-            <div class="quick-amounts">
-                <button class="quick-btn" onclick="setAmount(50000)">50,000</button>
-                <button class="quick-btn" onclick="setAmount(100000)">100,000</button>
-                <button class="quick-btn" onclick="setAmount(300000)">300,000</button>
-                <button class="quick-btn" onclick="setAmount(500000)">500,000</button>
-                <button class="quick-btn" onclick="setAmount(1000000)">1,000,000</button>
-                <button class="quick-btn" onclick="setAmount(2000000)">2,000,000</button>
-            </div>
-
-            <div class="bonus-info hidden" id="bonus-box">
-                <span>🎁 Bonus:</span>
-                <span id="bonus-amount">+0 so'm</span>
-            </div>
-
-            <div class="bonus-info hidden" id="total-box" style="background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: var(--primary);">
-                <span>💳 Umumiy to'lov:</span>
-                <span id="total-amount">0 so'm</span>
-            </div>
-
-            <button class="btn btn-primary mt-20" onclick="requestTopup()" id="btn-topup-submit">
-                Davom etish
-            </button>
-        </div>
-    </div>
-
-    <div id="topup-payment" class="payment-info hidden">
-        <div class="card-display">
-            <div class="card-holder">Karta egasi</div>
-            <div class="card-number" id="pay-card-number">---- ---- ---- ----</div>
-            <div class="card-holder" style="margin-top: 10px;">To'lov summasi</div>
-            <div class="card-number" id="pay-total-amount" style="color: white; font-size: 28px;">0 so'm</div>
-        </div>
-
-        <div class="timer-box">
-            <div class="timer-display" id="topup-timer">10:00</div>
-            <p style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Chekni yuboring</p>
+        <div class="topup-input-container">
+            <input type="number" class="topup-input" id="topup-amount" placeholder="0" oninput="calcBonus()">
+            <div style="color: var(--text-muted); font-weight: 700; font-size: 14px; margin-top: 4px;">so'm</div>
         </div>
         
-        <button class="btn btn-primary" id="btn-topup-status" onclick="checkTopupStatus()">
-            Holatni tekshirish
+        <div class="quick-amounts">
+            <button class="quick-btn" onclick="setAmt(50000)">50 000</button>
+            <button class="quick-btn" onclick="setAmt(100000)">100 000</button>
+            <button class="quick-btn" onclick="setAmt(300000)">300 000</button>
+            <button class="quick-btn" onclick="setAmt(500000)">500 000</button>
+            <button class="quick-btn" onclick="setAmt(1000000)">1 000 000</button>
+            <button class="quick-btn" onclick="setAmt(2000000)">2 000 000</button>
+        </div>
+
+        <div class="bonus-alert hidden" id="bonus-box">
+            <span>🎁 Sizga bonus:</span>
+            <span id="bonus-text">+0 so'm</span>
+        </div>
+
+        <button class="btn btn-primary" onclick="requestTopup()">
+            To'lovga o'tish
         </button>
-        <button class="btn btn-disabled mt-20" onclick="cancelTopup()">
-            Bekor qilish
+    </div>
+
+    <!-- To'lov qismi (Karta va Taymer) -->
+    <div id="topup-pay" class="hidden">
+        <div class="card-visual">
+            <div style="font-size:12px; color:#94A3B8; text-transform:uppercase; letter-spacing:1px;">Karta raqami</div>
+            <div class="card-num" id="pay-card">---- ---- ---- ----</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div>
+                    <div style="font-size:12px; color:#94A3B8;">Summa</div>
+                    <div style="font-size:24px; font-weight:800; color:#fff;" id="pay-amount">0 so'm</div>
+                </div>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            </div>
+        </div>
+
+        <div class="timer-container">
+            <div class="timer-text" id="topup-timer">10:00</div>
+            <p style="font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 5px;">To'lovni amalga oshirish vaqti</p>
+        </div>
+
+        <button class="btn btn-primary" onclick="checkTopupStatus()">
+            ✅ To'lovni tekshirish
+        </button>
+        <button class="btn btn-disabled" style="margin-top: 10px;" onclick="cancelTopup()">
+            ❌ Bekor qilish
         </button>
     </div>
 </main>
 
-<!-- ============================================================ -->
-<!-- HARIDLARIM (RENTALS) -->
-<!-- ============================================================ -->
+<!-- ========================================== -->
+<!-- 3. HARIDLARIM -->
+<!-- ========================================== -->
 <main class="container page" id="page-rentals">
     <div class="section-title">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
         Mening Haridlarim
     </div>
     <div id="rentals-list">
-        <!-- JS orqali to'ldiriladi -->
+        <!-- JS orqali yuklanadi -->
     </div>
 </main>
 
-<!-- ============================================================ -->
-<!-- REYTING (TOP 50) -->
-<!-- ============================================================ -->
+<!-- ========================================== -->
+<!-- 4. REYTING (TOP 50) -->
+<!-- ========================================== -->
 <main class="container page" id="page-rating">
     <div class="section-title">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l-3 9-3-9H2l6-6-2-6 6 3 6-3-2 6 6 6h-4z"></path></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l-3 9-3-9H2l6-6-2-6 6 3 6-3-2 6 6 6h-4z"></path></svg>
         Top 50 Foydalanuvchilar
     </div>
 
     <div class="rating-tabs">
-        <button class="rating-tab active" onclick="loadRating('week', this)">1 Haftalik</button>
-        <button class="rating-tab" onclick="loadRating('month', this)">1 Oylik</button>
-        <button class="rating-tab" onclick="loadRating('all_time', this)">Butunlay</button>
+        <div class="rating-tab active" onclick="loadRating('week', this)">1 Haftalik</div>
+        <div class="rating-tab" onclick="loadRating('month', this)">1 Oylik</div>
+        <div class="rating-tab" onclick="loadRating('all_time', this)">Butunlay</div>
     </div>
 
-    <div class="rating-list" id="rating-list">
-        <!-- JS orqali to'ldiriladi -->
-    </div>
+    <div id="rating-podium" class="podium-container hidden"></div>
+    <div id="rating-list"></div>
 </main>
 
-<!-- ============================================================ -->
-<!-- PROFIL (PROFILE) -->
-<!-- ============================================================ -->
+<!-- ========================================== -->
+<!-- 5. PROFIL VA ADMIN -->
+<!-- ========================================== -->
 <main class="container page" id="page-profile">
     <div class="section-title">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         Mening Profilim
     </div>
 
-    <div class="topup-card" style="text-align: center; padding: 30px 20px;">
-        <div class="avatar" id="prof-avatar" style="width: 80px; height: 80px; font-size: 32px; margin: 0 auto 16px;">C</div>
-        <h2 id="prof-name" style="font-size: 22px; margin-bottom: 4px;">Foydalanuvchi</h2>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;" id="prof-username">@username</p>
+    <div class="profile-card">
+        <img id="prof-avatar" class="profile-avatar-large" src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff">
+        <div class="profile-name" id="prof-name">...</div>
+        <div class="profile-id" id="prof-id">ID: 000000</div>
         
-        <div style="display: flex; justify-content: space-around; background: var(--bg); padding: 16px; border-radius: var(--radius); margin-bottom: 20px;">
-            <div>
-                <div style="font-size: 20px; font-weight: 800; color: var(--text);" id="prof-balance">0</div>
-                <div style="font-size: 12px; color: var(--text-muted);">Balans</div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-val" id="prof-balance">0</div>
+                <div class="stat-lbl">Balans (so'm)</div>
             </div>
-            <div style="width: 1px; background: var(--border);"></div>
-            <div>
-                <div style="font-size: 20px; font-weight: 800; color: var(--text);" id="prof-rentals">0</div>
-                <div style="font-size: 12px; color: var(--text-muted);">Haridlar</div>
+            <div class="stat-box">
+                <div class="stat-val" id="prof-rentals">0</div>
+                <div class="stat-lbl">Haridlar</div>
             </div>
         </div>
 
-        <button class="btn btn-disabled" style="margin-bottom: 10px;" onclick="showToast('Tez kunda!', 'error')">
-            🔒 Pasport yuklash (Admin tasdiqlaydi)
+        <button class="btn btn-primary hidden" id="btn-admin" onclick="toggleAdminPanel()">
+            🛡 Admin Panelni Ochish
         </button>
-        
-        <!-- ADMIN PANEL TUGMASI (Faqat adminlarga ko'rinadi) -->
-        <button class="btn btn-primary hidden" id="btn-admin-panel" onclick="openAdminPanel()">
-            🛡 Admin Panel
-        </button>
+    </div>
+
+    <!-- Admin Panel (Yashirin qism) -->
+    <div id="admin-panel" class="admin-panel" style="margin-top: 20px;">
+        <div class="section-title" style="font-size: 18px; margin-bottom: 10px;">📊 Statistika</div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-val" id="admin-users">0</div>
+                <div class="stat-lbl">Foydalanuvchilar</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val" id="admin-income">0</div>
+                <div class="stat-lbl">Tushum</div>
+            </div>
+        </div>
     </div>
 </main>
 
-<!-- ============================================================ -->
-<!-- PASTKI NAVIGATSIYA -->
-<!-- ============================================================ -->
-<nav class="bottom-nav hidden" id="bottom-nav">
-    <div class="nav-item active" data-page="page-main" onclick="switchPage('page-main', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+<!-- ========================================== -->
+<!-- MODAL OYNA (ARENDA OLISH UCHUN) -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="rent-modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-drag-handle"></div>
+        <div class="modal-header">
+            <div class="modal-title" id="modal-acc-name">Akkount</div>
+            <button class="close-btn" onclick="document.getElementById('rent-modal').classList.remove('active')">✕</button>
+        </div>
+        <div id="modal-prices" style="margin-bottom: 20px;"></div>
+        <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 16px;">
+            Tasdiqlaganingizdan so'ng, admin siz bilan bog'lanadi va akkountni beradi.
+        </p>
+    </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- BOTTOM NAVIGATSIYA -->
+<!-- ========================================== -->
+<nav class="bottom-nav hidden" id="main-nav">
+    <div class="nav-item active" onclick="nav('page-main', this)">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
         Asosiy
     </div>
-    <div class="nav-item" data-page="page-rentals" onclick="switchPage('page-rentals', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+    <div class="nav-item" onclick="nav('page-rentals', this)">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
         Haridlarim
     </div>
-    <div class="nav-item" data-page="page-topup" onclick="switchPage('page-topup', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-        To'ldirish
+    
+    <!-- Markaziy Tugma -->
+    <div class="nav-item" onclick="nav('page-topup', this)">
+        <div class="nav-center-btn">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+        <span style="margin-top: 8px;">To'ldirish</span>
     </div>
-    <div class="nav-item" data-page="page-rating" onclick="switchPage('page-rating', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15l-3 9-3-9H2l6-6-2-6 6 3 6-3-2 6 6 6h-4z"></path></svg>
+
+    <div class="nav-item" onclick="nav('page-rating', this)">
+        <svg viewBox="0 0 24 24"><path d="M12 15l-3 9-3-9H2l6-6-2-6 6 3 6-3-2 6 6 6h-4z"></path></svg>
         Reyting
     </div>
-    <div class="nav-item" data-page="page-profile" onclick="switchPage('page-profile', this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    <div class="nav-item" onclick="nav('page-profile', this)">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         Profil
     </div>
 </nav>
 
-<!-- ============================================================
-     JAVASCRIPT MANTIQI (Xatosiz va Mukammal)
-     ============================================================ -->
 <script>
     // ============================================================
-    // 1. TELEGRAM WEBAPP VA GLOBAL SOZLAMALAR
+    // 1. SOZLAMALAR VA GLOBAL O'ZGARUVCHILAR
     // ============================================================
+    // ⚠️ BU YERGA RAILWAY DOMENINI YOZING!
+    const API_URL = "https://cardinalarenda-production.up.railway.app"; 
+    
     const tg = window.Telegram?.WebApp;
     if (tg) {
         tg.expand();
@@ -1038,60 +1075,57 @@
         tg.setHeaderColor('#0F172A');
     }
 
-    // ⚠️ MUHIM: BU YERGA RAILWAY'DAGI DOMENINGIZNI YOZING!
-    const API_URL = "https://cardinalarenda-production.up.railway.app";
-    
     let TOKEN = null;
     let USER = null;
     let IS_ADMIN = false;
-    let topupInterval = null;
+    let topupTimer = null;
 
     // ============================================================
-    // 2. TOAST BILDIRISHNOMALARI
+    // 2. YORDAMCHI FUNKSIYALAR (TOAST, RIPPLE)
     // ============================================================
     function showToast(msg, type = 'success') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.innerHTML = `
-            ${type === 'success' ? '✅' : '❌'} 
-            <span>${msg}</span>
-        `;
+        toast.innerHTML = `${type === 'success' ? '✅' : '❌'} <span>${msg}</span>`;
         container.appendChild(toast);
         
         if (tg) tg.HapticFeedback.notificationOccurred(type === 'success' ? 'success' : 'error');
         
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
+        setTimeout(() => toast.remove(), 3000);
     }
 
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-primary');
+        if (!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + 'px';
+        ripple.style.left = e.clientX - rect.left - Math.max(rect.width, rect.height)/2 + 'px';
+        ripple.style.top = e.clientY - rect.top - Math.max(rect.width, rect.height)/2 + 'px';
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+    });
+
     // ============================================================
-    // 3. THEME (DARK/LIGHT MODE)
+    // 3. TUNGI/KUNDUZGI REJIM
     // ============================================================
     function toggleTheme() {
         const isDark = document.body.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        updateThemeIcon(isDark);
+        document.getElementById('theme-icon').innerHTML = isDark 
+            ? '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>'
+            : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
     }
-
-    function updateThemeIcon(isDark) {
-        const icon = document.getElementById('theme-icon');
-        if (isDark) {
-            icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
-        } else {
-            icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-        }
-    }
-
-    // Theme ni yuklash
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark');
-        updateThemeIcon(true);
+        toggleTheme(); // Update icon
+        toggleTheme(); // Re-apply dark class
     }
 
     // ============================================================
-    // 4. API BILAN ISHLASH
+    // 4. API BILAN ISHLASH (FETCH WRAPPER)
     // ============================================================
     async function apiFetch(endpoint, method = 'GET', body = null) {
         const headers = { 'Content-Type': 'application/json' };
@@ -1112,7 +1146,7 @@
     }
 
     // ============================================================
-    // 5. AVTORIZATSIYA (LOGIN)
+    // 5. AVTORIZATSIYA (LOGIN) VA BOSHLANG'ICH YUKLASH
     // ============================================================
     async function initApp() {
         if (!tg || !tg.initData) {
@@ -1122,7 +1156,6 @@
         }
 
         try {
-            // Auth API ga so'rov
             const data = await apiFetch('/api/auth', 'POST', { initData: tg.initData });
             
             if (data.ok) {
@@ -1130,25 +1163,44 @@
                 USER = data.user;
                 IS_ADMIN = data.user.is_admin;
 
-                // Header ma'lumotlari
+                // UI ni yangilash
                 document.getElementById('user-name').innerText = USER.name;
                 document.getElementById('user-balance').innerText = USER.balance.toLocaleString();
-                document.getElementById('user-avatar').innerHTML = USER.name[0].toUpperCase() + `<div class="avatar-badge badge-blue hidden" id="user-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
                 
-                if (USER.checkmark === 'blue' || USER.is_verified) {
-                    document.getElementById('user-badge').classList.remove('hidden');
+                // Avatar (Telegramdagi rasm)
+                if (USER.avatar) {
+                    document.getElementById('user-avatar').src = USER.avatar;
+                    document.getElementById('prof-avatar').src = USER.avatar;
+                }
+
+                // Galichka (Badge)
+                const badge = document.getElementById('user-badge');
+                const avatarImg = document.getElementById('user-avatar');
+                
+                if (USER.checkmark === 'blue') {
+                    badge.className = 'badge-icon b-blue'; badge.classList.remove('hidden');
+                    avatarImg.classList.add('verified-blue');
+                } else if (USER.checkmark === 'yellow') {
+                    badge.className = 'badge-icon b-yellow'; badge.classList.remove('hidden');
+                    avatarImg.classList.add('verified-yellow');
+                } else if (USER.checkmark === 'black') {
+                    badge.className = 'badge-icon b-black'; badge.classList.remove('hidden');
+                    avatarImg.classList.add('verified-black');
+                }
+
+                // Admin tugmasini ko'rsatish
+                if (IS_ADMIN) {
+                    document.getElementById('btn-admin').classList.remove('hidden');
                 }
 
                 // Splash yashirish
                 setTimeout(() => {
                     document.getElementById('splash').classList.add('hide');
                     document.getElementById('main-header').classList.remove('hidden');
-                    document.getElementById('bottom-nav').classList.remove('hidden');
+                    document.getElementById('main-nav').classList.remove('hidden');
                     
-                    // Dastlabki ma'lumotlarni yuklash
                     loadAccounts();
-                    loadProfile();
-                }, 1000);
+                }, 1200);
 
             } else {
                 document.getElementById('splash').classList.add('hide');
@@ -1160,87 +1212,175 @@
     }
 
     // ============================================================
-    // 6. SAHIFALAR ALMASHINUVI (NAVIGATSIYA)
+    // 6. NAVIGATSIYA (SAHIFALAR ALMASHINUVI)
     // ============================================================
-    function switchPage(pageId, navElement) {
-        // Barcha sahifalarni yashirish
+    function nav(pageId, navElement) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        // Barcha nav itemlarni o'chirish
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-        // Tanlanganni ochish
         document.getElementById(pageId).classList.add('active');
         if (navElement) navElement.classList.add('active');
 
         if (tg) tg.HapticFeedback.selectionChanged();
 
-        // Ma'lumotlarni yuklash (agar kerak bo'lsa)
-        if (pageId === 'page-main') loadAccounts();
         if (pageId === 'page-rentals') loadRentals();
         if (pageId === 'page-rating') loadRating('week', document.querySelector('.rating-tab'));
-        if (pageId === 'page-profile') loadProfile();
+        if (pageId === 'page-profile') updateProfileUI();
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ============================================================
-    // 7. AKKOUNTLARNI YUKLASH (ASOSIY MENYU)
+    // 7. AKKOUNTLARNI YUKLASH VA RENDER QILISH
     // ============================================================
     async function loadAccounts() {
+        const list = document.getElementById('accounts-list');
         try {
             const data = await apiFetch('/api/accounts');
-            const grid = document.getElementById('accounts-list');
-            grid.innerHTML = '';
+            list.innerHTML = '';
 
             if (data.accounts.length === 0) {
-                grid.innerHTML = `
-                    <div class="topup-card text-center">
+                list.innerHTML = `
+                    <div class="profile-card text-center">
                         <h3 style="color: var(--text-muted);">Hozircha akkountlar yo'q</h3>
-                    </div>
-                `;
+                        <p style="font-size: 13px; margin-top: 8px;">Tez orada yangi akkountlar qo'shiladi!</p>
+                    </div>`;
                 return;
             }
 
             data.accounts.forEach(acc => {
                 const isFree = acc.status === 'free';
-                const statusClass = isFree ? 'status-free' : 'status-busy';
-                const statusText = isFree ? '🟢 Bo\'sh' : '🔴 Band';
-                const btnClass = isFree ? 'btn-primary' : 'btn-disabled';
-                const btnText = isFree ? 'Arendaga olish' : 'Band qilingan';
-                
-                // Video yoki rasm uchun placeholder (agar backenddan kelsa ishlatiladi)
                 const imgUrl = acc.image_url || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000&auto=format&fit=crop';
+                
+                // Format details (Premium emojis should already be in details_text)
+                const detailsHtml = acc.details_text || "Ma'lumot yo'q";
 
-                grid.innerHTML += `
+                list.innerHTML += `
                     <div class="account-card">
-                        <img src="${imgUrl}" class="acc-image" alt="PUBG Account">
-                        <div class="acc-status-badge ${statusClass}">${statusText}</div>
+                        <div class="acc-media-container">
+                            <img src="${imgUrl}" class="acc-media" alt="${acc.acc_name}">
+                            <div class="status-badge ${isFree ? 'status-free' : 'status-busy'}">
+                                ${isFree ? '🟢 Bo\'sh' : '🔴 Band'}
+                            </div>
+                        </div>
                         <div class="acc-content">
                             <div class="acc-header">
                                 <div class="acc-title">${acc.acc_name}</div>
                             </div>
-                            <div class="acc-details">${acc.details_text || 'Ma\'lumot yo\'q'}</div>
-                            <button class="btn ${btnClass}" onclick="${isFree ? `openRentModal(${acc.id}, '${acc.acc_name}', ${JSON.stringify(acc.prices).replace(/"/g, '&quot;')})` : ''}" ${!isFree ? 'disabled' : ''}>
-                                ${btnText}
+                            <div class="acc-details-text">${detailsHtml}</div>
+                            <button class="btn ${isFree ? 'btn-primary' : 'btn-disabled'}" 
+                                onclick='${isFree ? `openRentModal(${acc.id}, "${acc.acc_name}", ${JSON.stringify(acc.prices).replace(/"/g, '&quot;')})` : ''}' 
+                                ${!isFree ? 'disabled' : ''}>
+                                ${isFree ? '⚡ Arendaga olish' : '⌛ Band qilingan'}
                             </button>
                         </div>
                     </div>
                 `;
             });
         } catch (e) {
-            console.error(e);
+            list.innerHTML = `<p style="text-align:center; color:var(--danger);">Xatolik yuz berdi</p>`;
         }
     }
 
     // ============================================================
-    // 8. BALANS TO'LDIRISH (TOPUP LOGIKASI)
+    // 8. ARENDA OLISH MODAL LOGIKASI
     // ============================================================
-    function setAmount(val) {
-        document.getElementById('topup-amount').value = val;
-        calculateBonus();
+    function openRentModal(accId, accName, pricesStr) {
+        const prices = JSON.parse(pricesStr.replace(/&quot;/g, '"'));
+        
+        document.getElementById('modal-acc-name').innerText = accName;
+        const container = document.getElementById('modal-prices');
+        container.innerHTML = '';
+
+        for (const [duration, price] of Object.entries(prices)) {
+            let label = duration === 'night' ? '🌙 Tungi paket (21:00-08:00)' : `⏱ ${duration} soat`;
+            container.innerHTML += `
+                <div class="price-option" onclick="confirmRent(${accId}, '${duration}', ${price})">
+                    <span style="font-weight: 700;">${label}</span>
+                    <span style="font-weight: 800; color: var(--primary);">${price.toLocaleString()} so'm</span>
+                </div>
+            `;
+        }
+
+        document.getElementById('rent-modal').classList.add('active');
     }
 
-    function calculateBonus() {
+    async function confirmRent(accId, duration, price) {
+        if (USER.balance < price) {
+            showToast('Balansingizda yetarli mablag\' yo\'q!', 'error');
+            return;
+        }
+
+        try {
+            const data = await apiFetch('/api/rent', 'POST', { account_id: accId, duration: duration });
+            if (data.ok) {
+                showToast('Harid qabul qilindi! Admin tasdiqlashini kuting.', 'success');
+                document.getElementById('rent-modal').classList.remove('active');
+                loadAccounts();
+            }
+        } catch (e) {}
+    }
+
+    // ============================================================
+    // 9. HARIDLARIM (RENTALS) YUKLASH
+    // ============================================================
+    async function loadRentals() {
+        const list = document.getElementById('rentals-list');
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">Yuklanmoqda...</div>';
+        
+        try {
+            const data = await apiFetch('/api/my-rentals');
+            list.innerHTML = '';
+
+            if (data.rentals.length === 0) {
+                list.innerHTML = `
+                    <div class="profile-card text-center">
+                        <h3 style="color: var(--text-muted);">Sizda hali haridlar yo'q</h3>
+                        <p style="font-size: 13px; margin-top: 8px;">Akkountlarni arendaga oling va ular shu yerda ko'rinadi!</p>
+                    </div>`;
+                return;
+            }
+
+            data.rentals.forEach(r => {
+                let statusHtml = '';
+                if (r.status === 'pending') statusHtml = '<span style="color:var(--warning); font-weight:800;">⏳ Kutilmoqda</span>';
+                if (r.status === 'active') statusHtml = '<span style="color:var(--success); font-weight:800;">🟢 Faol</span>';
+                if (r.status === 'rejected') statusHtml = '<span style="color:var(--danger); font-weight:800;">❌ Rad etilgan</span>';
+                if (r.status === 'completed') statusHtml = '<span style="color:var(--text-muted); font-weight:800;">✅ Tugagan</span>';
+
+                let timeHtml = '';
+                if (r.status === 'active' && r.start_time && r.end_time) {
+                    const start = new Date(r.start_time).toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'});
+                    const end = new Date(r.end_time).toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'});
+                    timeHtml = `<div style="font-size:13px; color:var(--primary); margin-top:8px; font-weight:700;">⏰ ${start} dan ${end} gacha</div>`;
+                }
+
+                list.innerHTML += `
+                    <div class="profile-card" style="padding: 16px; text-align: left; margin-bottom: 12px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <div style="font-weight:800; font-size:16px;">${r.acc_name}</div>
+                            ${statusHtml}
+                        </div>
+                        <div style="font-size:14px; color:var(--text-muted);">To'lov: <b>${r.price.toLocaleString()} so'm</b></div>
+                        ${timeHtml}
+                    </div>
+                `;
+            });
+        } catch (e) {
+            list.innerHTML = '';
+        }
+    }
+
+    // ============================================================
+    // 10. BALANS TO'LDIRISH (TOPUP LOGIKASI)
+    // ============================================================
+    function setAmt(val) {
+        document.getElementById('topup-amount').value = val;
+        calcBonus();
+        if (tg) tg.HapticFeedback.impactOccurred('light');
+    }
+
+    function calcBonus() {
         const amount = parseInt(document.getElementById('topup-amount').value) || 0;
         let bonus = 0;
         
@@ -1248,26 +1388,19 @@
         else if (amount >= 300000 && amount < 500000) bonus = amount * 0.20;
         else if (amount >= 500000) bonus = amount * 0.30;
 
-        const total = amount + bonus;
-
-        const bonusBox = document.getElementById('bonus-box');
-        const totalBox = document.getElementById('total-box');
-
+        const box = document.getElementById('bonus-box');
         if (bonus > 0) {
-            bonusBox.classList.remove('hidden');
-            totalBox.classList.remove('hidden');
-            document.getElementById('bonus-amount').innerText = `+${bonus.toLocaleString()} so'm`;
-            document.getElementById('total-amount').innerText = `${total.toLocaleString()} so'm`;
+            box.classList.remove('hidden');
+            document.getElementById('bonus-text').innerText = `+${bonus.toLocaleString()} so'm`;
         } else {
-            bonusBox.classList.add('hidden');
-            totalBox.classList.add('hidden');
+            box.classList.add('hidden');
         }
     }
 
     async function requestTopup() {
         const amount = parseInt(document.getElementById('topup-amount').value) || 0;
         if (amount < 5000) {
-            showToast('Minimal to\'lov 5,000 so\'m!', 'error');
+            showToast('Minimal to\'lov summasi 5,000 so\'m!', 'error');
             return;
         }
 
@@ -1276,28 +1409,28 @@
             
             if (data.ok) {
                 document.getElementById('topup-form').classList.add('hidden');
-                document.getElementById('topup-payment').classList.remove('hidden');
+                document.getElementById('topup-pay').classList.remove('hidden');
                 
-                document.getElementById('pay-card-number').innerText = data.card;
-                document.getElementById('pay-total-amount').innerText = `${data.amount.toLocaleString()} so'm`;
+                document.getElementById('pay-card').innerText = data.card;
+                document.getElementById('pay-amount').innerText = `${data.amount.toLocaleString()} so'm`;
                 
                 startTopupTimer(data.expires_at);
-                showToast('To\'lov yaratildi. Chekni yuboring!', 'success');
+                showToast('To\'lov yaratildi. Iltimos, pulni o\'tkazing!', 'success');
             }
         } catch (e) {}
     }
 
     function startTopupTimer(expiresAt) {
-        if (topupInterval) clearInterval(topupInterval);
+        if (topupTimer) clearInterval(topupTimer);
         const end = new Date(expiresAt).getTime();
         const display = document.getElementById('topup-timer');
 
-        topupInterval = setInterval(() => {
+        topupTimer = setInterval(() => {
             const now = new Date().getTime();
             const diff = end - now;
 
             if (diff <= 0) {
-                clearInterval(topupInterval);
+                clearInterval(topupTimer);
                 display.innerText = "00:00";
                 display.classList.add('warning');
                 showToast('To\'lov vaqti tugadi!', 'error');
@@ -1317,222 +1450,134 @@
         try {
             const data = await apiFetch('/api/topup/status');
             if (data.status === 'completed') {
-                showToast('To\'lov tasdiqlandi! Balans to\'ldirildi', 'success');
-                if (topupInterval) clearInterval(topupInterval);
-                document.getElementById('topup-form').classList.remove('hidden');
-                document.getElementById('topup-payment').classList.add('hidden');
-                document.getElementById('topup-amount').value = '';
-                loadProfile();
+                showToast('To\'lov tasdiqlandi! Balansingiz to\'ldirildi', 'success');
+                if (topupTimer) clearInterval(topupTimer);
+                
+                // Balansni yangilash
+                const userRes = await apiFetch('/api/profile');
+                USER.balance = userRes.user.balance;
+                document.getElementById('user-balance').innerText = USER.balance.toLocaleString();
+                
+                cancelTopup();
             } else {
-                showToast('To\'lov hali tasdiqlanmadi. Kuting...', 'error');
+                showToast('To\'lov hali tasdiqlanmadi. Iltimos kuting...', 'error');
             }
         } catch (e) {}
     }
 
     function cancelTopup() {
-        if (topupInterval) clearInterval(topupInterval);
+        if (topupTimer) clearInterval(topupTimer);
         document.getElementById('topup-form').classList.remove('hidden');
-        document.getElementById('topup-payment').classList.add('hidden');
+        document.getElementById('topup-pay').classList.add('hidden');
         document.getElementById('topup-amount').value = '';
+        document.getElementById('bonus-box').classList.add('hidden');
+        document.getElementById('topup-timer').classList.remove('warning');
     }
 
     // ============================================================
-    // 9. REYTING (TOP 50)
+    // 11. REYTING (TOP 50) VA PODIUM
     // ============================================================
-    async function loadRating(timeframe, btn) {
+    async function loadRating(timeframe, btnElement) {
         document.querySelectorAll('.rating-tab').forEach(b => b.classList.remove('active'));
-        if (btn) btn.classList.add('active');
+        if (btnElement) btnElement.classList.add('active');
+
+        const list = document.getElementById('rating-list');
+        const podium = document.getElementById('rating-podium');
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">Yuklanmoqda...</div>';
+        podium.innerHTML = '';
 
         try {
             const data = await apiFetch(`/api/rating?timeframe=${timeframe}`);
-            const list = document.getElementById('rating-list');
             list.innerHTML = '';
 
             if (data.rating.length === 0) {
-                list.innerHTML = `<p class="text-center" style="color:var(--text-muted);margin-top:20px;">Reyting bo'sh</p>`;
+                list.innerHTML = `<p style="text-align:center; color:var(--text-muted); margin-top:20px;">Reyting bo'sh</p>`;
+                podium.classList.add('hidden');
                 return;
             }
 
-            data.rating.forEach((user, index) => {
-                const rank = index + 1;
-                let rankClass = '';
-                if (rank === 1) rankClass = 'rank-1';
-                if (rank === 2) rankClass = 'rank-2';
-                if (rank === 3) rankClass = 'rank-3';
-                
-                let badge = '';
-                if (user.checkmark_type === 'blue') badge = '🔵';
-                if (user.checkmark_type === 'yellow') badge = '🟡';
-                if (user.checkmark_type === 'black') badge = '⚫';
-
-                list.innerHTML += `
-                    <div class="rating-item">
-                        <div class="rating-rank ${rankClass}">${rank}</div>
-                        <div class="rating-avatar">${user.full_name[0].toUpperCase()}</div>
-                        <div class="rating-name">${user.full_name} ${badge}</div>
-                        <div class="rating-score">${user.score.toLocaleString()}</div>
-                    </div>
-                `;
-            });
-        } catch (e) {}
-    }
-
-    // ============================================================
-    // 10. PROFILNI YUKLASH
-    // ============================================================
-    function loadProfile() {
-        if (!USER) return;
-        document.getElementById('prof-name').innerText = USER.name;
-        document.getElementById('prof-username').innerText = USER.username ? `@${USER.username}` : 'Telegram user';
-        document.getElementById('prof-balance').innerText = USER.balance.toLocaleString();
-        document.getElementById('prof-avatar').innerText = USER.name[0].toUpperCase();
-        
-        if (IS_ADMIN) {
-            document.getElementById('btn-admin-panel').classList.remove('hidden');
-        }
-    }
-
-    // ============================================================
-    // 11. ARENDA OLISH (RENT MODAL)
-    // ============================================================
-    function openRentModal(accId, accName, prices) {
-        const priceObj = typeof prices === 'string' ? JSON.parse(prices.replace(/&quot;/g, '"')) : prices;
-        
-        let optionsHtml = '';
-        for (const [duration, price] of Object.entries(priceObj)) {
-            let label = duration === 'night' ? 'Tungi paket (21:00-08:00)' : `${duration} soat`;
-            optionsHtml += `
-                <div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid var(--border);">
-                    <span style="font-weight:600;">${label}</span>
-                    <span style="font-weight:800; color:var(--primary);">${price.toLocaleString()} so'm</span>
-                </div>
-            `;
-        }
-
-        // Modal oyna yaratish
-        const modal = document.createElement('div');
-        modal.className = 'modal active';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-title">${accName} - Tariflar</div>
-                    <button class="close-modal" onclick="this.closest('.modal').remove()">✕</button>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    ${optionsHtml}
-                </div>
-                <p style="font-size:12px; color:var(--text-muted); text-align:center; margin-bottom:10px;">
-                    Tasdiqlaganingizdan so'ng admin siz bilan bog'lanadi.
-                </p>
-                <button class="btn btn-primary" onclick="submitRent(${accId}, Object.keys(priceObj)[0])">Tasdiqlash (Sinov uchun 1-vaqt)</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
-
-    async function submitRent(accId, duration) {
-        try {
-            const data = await apiFetch('/api/rent', 'POST', { account_id: accId, duration: duration });
-            if (data.ok) {
-                showToast('Harid qabul qilindi! Admin tasdiqlashini kuting', 'success');
-                document.querySelector('.modal').remove();
-                switchPage('page-rentals', document.querySelectorAll('.nav-item')[1]);
-            }
-        } catch (e) {}
-    }
-
-    // ============================================================
-    // 12. HARIDLARIM (RENTALS)
-    // ============================================================
-    async function loadRentals() {
-        try {
-            const data = await apiFetch('/api/my-rentals');
-            const list = document.getElementById('rentals-list');
-            list.innerHTML = '';
-
-            if (data.rentals.length === 0) {
-                list.innerHTML = `<div class="topup-card text-center"><h3 style="color:var(--text-muted);">Sizda hali haridlar yo'q</h3></div>`;
-                return;
-            }
-
-            data.rentals.forEach(r => {
-                let statusText = '';
-                let statusClass = '';
-                
-                if (r.status === 'pending') { statusText = 'Kutilmoqda'; statusClass = 'st-pending'; }
-                if (r.status === 'active') { statusText = 'Faol'; statusClass = 'st-active'; }
-                if (r.status === 'completed') { statusText = 'Tugagan'; statusClass = 'st-completed'; }
-                if (r.status === 'rejected') { statusText = 'Rad etilgan'; statusClass = 'st-rejected'; }
-
-                let timeHtml = '';
-                if (r.status === 'active' && r.start_time && r.end_time) {
-                    const start = new Date(r.start_time).toLocaleString('uz-UZ');
-                    const end = new Date(r.end_time).toLocaleString('uz-UZ');
-                    timeHtml = `
-                        <div class="rental-time">
-                            🕐 ${start} dan <br> 🏁 ${end} gacha
+            // Podium (Top 3)
+            const top3 = data.rating.slice(0, 3);
+            if (top3.length > 0) {
+                podium.classList.remove('hidden');
+                top3.forEach((u, index) => {
+                    let rankClass = `podium-${index + 1}`;
+                    let medal = index === 0 ? '👑' : index === 1 ? '🥈' : '🥉';
+                    
+                    podium.innerHTML += `
+                        <div class="podium-item ${rankClass}">
+                            <div style="font-size: 24px; margin-bottom: -10px; z-index: 2;">${medal}</div>
+                            <img src="https://ui-avatars.com/api/?name=${u.full_name}&background=random" class="podium-avatar">
+                            <div class="podium-name">${u.full_name.split(' ')[0]}</div>
+                            <div class="podium-score">${u.score.toLocaleString()} so'm</div>
                         </div>
                     `;
-                }
+                });
+            }
+
+            // Qolganlar (4 dan 50 gacha)
+            const rest = data.rating.slice(3);
+            rest.forEach((u, index) => {
+                const rank = index + 4;
+                let badge = '';
+                if (u.checkmark_type === 'blue') badge = '🔵';
+                if (u.checkmark_type === 'yellow') badge = '🟡';
+                if (u.checkmark_type === 'black') badge = '⚫';
 
                 list.innerHTML += `
-                    <div class="rental-card">
-                        <div class="rental-header">
-                            <div class="rental-title">${r.acc_name}</div>
-                            <div class="rental-status ${statusClass}">${statusText}</div>
-                        </div>
-                        <div style="font-size:14px; color:var(--text-muted);">
-                            To'lov: <b style="color:var(--text);">${r.price.toLocaleString()} so'm</b>
-                        </div>
-                        ${timeHtml}
+                    <div class="rating-row">
+                        <div class="rank-num">${rank}</div>
+                        <img src="https://ui-avatars.com/api/?name=${u.full_name}&background=random" class="rank-avatar">
+                        <div class="rank-name">${u.full_name} ${badge}</div>
+                        <div class="rank-score">${u.score.toLocaleString()}</div>
                     </div>
                 `;
             });
-        } catch (e) {}
-    }
-
-    // ============================================================
-    // 13. ADMIN PANEL (FAQAT ADMINLAR UCHUN)
-    // ============================================================
-    async function openAdminPanel() {
-        try {
-            const data = await apiFetch('/api/admin/stats');
-            const s = data.stats;
-
-            const modal = document.createElement('div');
-            modal.className = 'modal active';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div class="modal-title">🛡 Admin Panel</div>
-                        <button class="close-modal" onclick="this.closest('.modal').remove()">✕</button>
-                    </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
-                        <div style="background:var(--bg); padding:16px; border-radius:12px; text-align:center;">
-                            <div style="font-size:24px; font-weight:800; color:var(--primary);">${s.users}</div>
-                            <div style="font-size:12px; color:var(--text-muted);">Foydalanuvchilar</div>
-                        </div>
-                        <div style="background:var(--bg); padding:16px; border-radius:12px; text-align:center;">
-                            <div style="font-size:24px; font-weight:800; color:var(--success);">${s.active_rentals}</div>
-                            <div style="font-size:12px; color:var(--text-muted);">Aktiv Arendalar</div>
-                        </div>
-                        <div style="background:var(--bg); padding:16px; border-radius:12px; text-align:center; grid-column: span 2;">
-                            <div style="font-size:24px; font-weight:800; color:var(--gold);">${s.total_income.toLocaleString()} so'm</div>
-                            <div style="font-size:12px; color:var(--text-muted);">Umumiy Tushum</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Yopish</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
         } catch (e) {
-            showToast('Admin ma\'lumotlarini olishda xatolik', 'error');
+            list.innerHTML = '';
+            podium.classList.add('hidden');
         }
     }
 
     // ============================================================
-    // 14. ISHGA TUSHIRISH
+    // 12. PROFIL VA ADMIN PANEL
     // ============================================================
+    function updateProfileUI() {
+        if (!USER) return;
+        document.getElementById('prof-name').innerText = USER.name;
+        document.getElementById('prof-id').innerText = `ID: ${USER.tg_id}`;
+        document.getElementById('prof-balance').innerText = USER.balance.toLocaleString();
+        
+        // Profile avatar updated in initApp
+    }
+
+    function toggleAdminPanel() {
+        const panel = document.getElementById('admin-panel');
+        if (panel.classList.contains('active')) {
+            panel.classList.remove('active');
+        } else {
+            panel.classList.add('active');
+            loadAdminStats();
+        }
+    }
+
+    async function loadAdminStats() {
+        try {
+            const data = await apiFetch('/api/admin/stats');
+            document.getElementById('admin-users').innerText = data.stats.users;
+            document.getElementById('admin-income').innerText = data.stats.total_income.toLocaleString();
+        } catch (e) {}
+    }
+
+    // ============================================================
+    // 13. YOPISH VA ISHGA TUSHIRISH
+    // ============================================================
+    function closeModal(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.classList.remove('active');
+        }
+    }
+
     window.onload = () => {
         initApp();
     };
