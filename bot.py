@@ -9,37 +9,87 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import (
-    ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup,
+    ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, 
     InlineKeyboardButton, WebAppInfo
 )
 
-from config import BOT, PREMIUM_EMOJI
+from config import BOT
 from db import db
-from userbot import CardXabarWatcher
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("CardinalBot")
 
 # ============================================================
-# PREMIUM EMOJI PARSER
+# PREMIUM EMOJILAR (Bot.py ichida)
 # ============================================================
+PREMIUM_EMOJI = {
+    "✔️": "5206607081334906820",
+    "❌": "5210952531676504517",
+    "⌛️": "5296482716567495148",
+    "⚠️": "5447644880824181073",
+    "1️⃣": "5382322671679708881",
+    "2️⃣": "5381990043642502553",
+    "3️⃣": "5381879959335738545",
+    "4️⃣": "5382054253403577563",
+    "✨": "5325547803936572038",
+    "🚫": "5240241223632954241",
+    "🟢": "5832572966721818453",
+    "🔴": "5411225014148014586",
+    "▶️": "5348125953090403204",
+    "⏳": "5368380585066665290",
+    "⛔️": "5370675038200541160",
+    "👤": "5879770735999717115",
+    "👥": "5372926953978341366",
+    "🔤": "5841276284155467413",
+    "🧾": "5444856076954520455",
+    "🖥": "5282843764451195532",
+    "📱": "5355116622250026900",
+    "📞": "5467539229468793355",
+    "📲": "5406809207947142040",
+    "🔗": "5271604874419647061",
+    "❤️": "5354817009626425681",
+    "👑": "5217822164362739968",
+    "👋": "5413694143601842851",
+    "🎮": "5361741454685256344",
+    "📌": "5397782960512444700",
+    "🌐": "5447410659077661506",
+    "📢": "5278256077954105203",
+    "💳": "5445353829304387411",
+    "ℹ️": "5334544901428229844",
+    "🛡": "5251203410396458957",
+    "🤖": "5287684458881756303",
+    "🗓": "5413879192267805083",
+    "📁": "5336899419679792193",
+    "📊": "5231200819986047254",
+    "💰": "5224257782013769471",
+    "💸": "5231449120635370684",
+    "💵": "5409048419211682843",
+    "➕": "5397916757333654639",
+    "🎬": "5375464961822695044",
+    "🛒": "5312361253610475399",
+    "🏆": "5226431245918942763",
+    "🎯": "5256131095094652290",
+    "🚗": "5233638613358486264",
+    "🔫": "5192724084881892602",
+    "💎": "5427168083074628963",
+    "📍": "5391032818111363540",
+    "🏠": "5416041192905265756",
+    "⚡️": "5456140674028019486",
+    "✅": "5895628223407984747",
+}
+
 _EMOJI_KEYS = sorted(PREMIUM_EMOJI.keys(), key=len, reverse=True)
 _EMOJI_PATTERN = re.compile("|".join(re.escape(e) for e in _EMOJI_KEYS))
 
-
 def pe(text: str) -> str:
-    """Matndagi emojilarni Premium Emojiga aylantiradi"""
     if not text: return text
-
     def repl(m):
         emoji = m.group(0)
         eid = PREMIUM_EMOJI.get(emoji)
         if eid:
             return f'<tg-emoji emoji-id="{eid}">{emoji}</tg-emoji>'
         return emoji
-
     return _EMOJI_PATTERN.sub(repl, text)
-
 
 # ============================================================
 # BOT & DISPATCHER
@@ -47,30 +97,24 @@ def pe(text: str) -> str:
 bot = Bot(token=BOT.TOKEN, parse_mode="HTML")
 dp = Dispatcher()
 
-# Userbotni ishga tushirish (To'lovlarni tutish uchun)
-userbot = CardXabarWatcher(db=db, bot=bot)
-
-
 # ============================================================
 # FSM STATES
 # ============================================================
 class AdminStates(StatesGroup):
-    add_card_num = State()
-    add_card_holder = State()
     add_acc_name = State()
     add_acc_video = State()
-    add_acc_details = State()
+    add_acc_text = State()
     add_acc_prices = State()
-
+    upload_passport = State()
 
 # ============================================================
-# START & ASOSIY MENYU
+# ASOSIY MENYU
 # ============================================================
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message):
     u = message.from_user
     user = await db.get_user(u.id)
-
+    
     if not user:
         await db.create_user(u.id, u.full_name, u.username)
         user = await db.get_user(u.id)
@@ -78,7 +122,6 @@ async def cmd_start(message: types.Message):
     if user['is_blocked']:
         return await message.answer(pe("🚫 <b>Siz bloklangansiz!</b>"))
 
-    # Telefon raqam so'rash (agar yo'q bo'lsa)
     if not user['phone']:
         kb = ReplyKeyboardMarkup(
             keyboard=[[KeyboardButton(text="📞 Raqamni yuborish", request_contact=True)]],
@@ -91,9 +134,7 @@ async def cmd_start(message: types.Message):
             reply_markup=kb
         )
 
-    # Asosiy menyu
     await show_main_menu(message)
-
 
 @dp.message(F.contact)
 async def handle_contact(message: types.Message):
@@ -103,7 +144,6 @@ async def handle_contact(message: types.Message):
     await message.answer(pe("✅ <b>Telefon raqam saqlandi!</b>"), reply_markup=types.ReplyKeyboardRemove())
     await show_main_menu(message)
 
-
 async def show_main_menu(message: types.Message):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🚀 Web App ochish", web_app=WebAppInfo(url=BOT.WEBAPP_URL))],
@@ -112,8 +152,7 @@ async def show_main_menu(message: types.Message):
         [InlineKeyboardButton(text="👤 Profilim", callback_data="profile"),
          InlineKeyboardButton(text="🏆 Reyting", callback_data="rating")]
     ])
-
-    # Admin bo'lsa qo'shimcha tugma
+    
     user = await db.get_user(message.from_user.id)
     if user['is_admin'] or message.from_user.id == BOT.ADMIN_ID:
         kb.inline_keyboard.append([InlineKeyboardButton(text="🛡 Admin Panel", callback_data="admin_panel")])
@@ -125,9 +164,8 @@ async def show_main_menu(message: types.Message):
         reply_markup=kb
     )
 
-
 # ============================================================
-# ADMIN PANEL (Bot ichida)
+# ADMIN PANEL
 # ============================================================
 @dp.callback_query(F.data == "admin_panel")
 async def admin_panel(cb: types.CallbackQuery):
@@ -141,64 +179,25 @@ async def admin_panel(cb: types.CallbackQuery):
         f"🎮 Aktiv Arendalar: <b>{stats['active_rentals']}</b> ta\n"
         f"💰 Umumiy Tushum: <b>{stats['total_income']:,} so'm</b>"
     )
-
+    
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💳 Karta qo'shish", callback_data="admin_add_card"),
-         InlineKeyboardButton(text="🎮 Akkount qo'shish", callback_data="admin_add_acc")],
+        [InlineKeyboardButton(text="🎮 Akkount qo'shish (Bot orqali)", callback_data="admin_add_acc")],
         [InlineKeyboardButton(text="📊 Statistika (WebApp)", web_app=WebAppInfo(url=BOT.WEBAPP_URL + "?admin=1"))],
         [InlineKeyboardButton(text="⬅️ Orqaga", callback_data="back_to_menu")]
     ])
-
+    
     await cb.message.edit_text(pe(text), reply_markup=kb)
-
 
 @dp.callback_query(F.data == "back_to_menu")
 async def back_to_menu(cb: types.CallbackQuery):
     await cb.message.delete()
     await show_main_menu(cb.message)
 
-
-# --- Admin: Karta Qo'shish ---
-@dp.callback_query(F.data == "admin_add_card")
-async def admin_add_card(cb: types.CallbackQuery, state: FSMContext):
-    await cb.message.answer(pe("💳 <b>Yangi karta qo'shish</b>\n\n16 xonali karta raqamini kiriting:"))
-    await state.set_state(AdminStates.add_card_num)
-
-
-@dp.message(AdminStates.add_card_num)
-async def process_card_num(message: types.Message, state: FSMContext):
-    card_num = message.text.replace(" ", "")
-    if len(card_num) != 16 or not card_num.isdigit():
-        return await message.answer("❌ Xato! 16 xonali raqam kiriting:")
-
-    await state.update_data(card_num=card_num)
-    await message.answer(pe("👤 Endi karta egasining ism-familiyasini kiriting (Masalan: CARDINAL ADMIN):"))
-    await state.set_state(AdminStates.add_card_holder)
-
-
-@dp.message(AdminStates.add_card_holder)
-async def process_card_holder(message: types.Message, state: FSMContext):
-    holder = message.text.upper()
-    data = await state.get_data()
-
-    # Bazaga saqlash (settings jadvaliga yoki alohida cards jadvaliga)
-    await db.pool.execute("""
-                          INSERT INTO settings (key, value)
-                          VALUES ($1, $2) ON CONFLICT (key) DO
-                          UPDATE SET value = EXCLUDED.value
-                          """, f"card_{data['card_num']}", holder)
-
-    await message.answer(pe(f"✅ <b>Karta saqlandi!</b>\n\n💳 {data['card_num']}\n👤 {holder}"))
-    await state.clear()
-
-
-# --- Admin: Akkount Qo'shish (Bot orqali) ---
+# --- Admin: Akkount Qo'shish (FSM) ---
 @dp.callback_query(F.data == "admin_add_acc")
 async def admin_add_acc(cb: types.CallbackQuery, state: FSMContext):
-    await cb.message.answer(
-        pe("🎮 <b>Yangi Akkount Qo'shish</b>\n\nAkkount nomini kiriting (Masalan: #1 yoki #3 Cardinal VIP):"))
+    await cb.message.answer(pe("🎮 <b>Yangi Akkount Qo'shish</b>\n\nAkkount nomini kiriting (Masalan: #1 yoki #3 Cardinal VIP):"))
     await state.set_state(AdminStates.add_acc_name)
-
 
 @dp.message(AdminStates.add_acc_name)
 async def process_acc_name(message: types.Message, state: FSMContext):
@@ -206,125 +205,131 @@ async def process_acc_name(message: types.Message, state: FSMContext):
     await message.answer(pe("🎬 Endi akkount uchun <b>VIDEO</b> yuboring:"))
     await state.set_state(AdminStates.add_acc_video)
 
-
 @dp.message(AdminStates.add_acc_video, F.video)
 async def process_acc_video(message: types.Message, state: FSMContext):
-    # Videoni saqlash (keyinchalik userbot orqali kanalga yuboramiz)
-    await state.update_data(video_id=message.video.file_id)
-    await message.answer(
-        pe("📝 Endi akkount ma'lumotlarini yozing (qatorma-qator):\n\nMasalan:\n75 KOLLEKSIYA\n230 TA MIFIK\nFARAON - 7 LVL"))
-    await state.set_state(AdminStates.add_acc_details)
+    # Videoni kanalga saqlash
+    try:
+        saved_msg = await message.forward(BOT.VIDEO_CHANNEL_ID)
+        await state.update_data(video_msg_id=saved_msg.message_id)
+    except Exception as e:
+        return await message.answer(pe(f"❌ Videoni kanalga saqlashda xato: {e}\nIltimos qayta yuboring."))
 
+    await message.answer(pe("📝 Endi akkount ma'lumotlarini yozing (Premium emojilar bilan yozishingiz mumkin):\n\nMasalan:\n75 KOLLEKSIYA\n230 TA MIFIK\nFARAON - 7 LVL"))
+    await state.set_state(AdminStates.add_acc_text)
 
-@dp.message(AdminStates.add_acc_details)
-async def process_acc_details(message: types.Message, state: FSMContext):
-    await state.update_data(details=message.text)
-    await message.answer(
-        pe("💰 Endi narxlarni kiriting (JSON formatida emas, oddiy matnda):\n\nMasalan:\n1 soat - 25000\n6 soat - 49000\n12 soat - 70000\n24 soat - 99000\nTungi paket - 50000"))
+@dp.message(AdminStates.add_acc_text)
+async def process_acc_text(message: types.Message, state: FSMContext):
+    await state.update_data(details_text=message.html_text) # Premium emojilarni saqlash uchun html_text
+    await message.answer(pe("💰 Endi narxlarni kiriting:\n\nMasalan:\n2 - 25000\n6 - 49000\nnight - 50000"))
     await state.set_state(AdminStates.add_acc_prices)
-
 
 @dp.message(AdminStates.add_acc_prices)
 async def process_acc_prices(message: types.Message, state: FSMContext):
     data = await state.get_data()
-
-    # Narxlarni parse qilish (regex orqali)
+    
+    # Narxlarni parse qilish
     prices = {}
     lines = message.text.split("\n")
     for line in lines:
-        if "soat" in line.lower():
-            match = re.search(r'(\d+)\s*soat.*?(\d+)', line)
-            if match:
-                prices[match.group(1)] = int(match.group(2))
-        elif "tungi" in line.lower():
-            match = re.search(r'(\d+)', line)
-            if match:
-                prices["night"] = int(match.group(1))
+        if "-" in line:
+            parts = line.split("-")
+            key = parts[0].strip().lower()
+            val = int(re.sub(r'\D', '', parts[1]))
+            prices[key] = val
 
     await db.create_account(
         acc_name=data['acc_name'],
         acc_type="bot",
-        video_msg_id=data['video_id'],
+        video_msg_id=str(data['video_msg_id']),
         image_url=None,
-        details_text=data['details'],
+        details_text=data['details_text'],
         prices_json=prices
     )
-
+    
     await message.answer(pe(f"✅ <b>Akkount qo'shildi!</b>\n\n🎮 {data['acc_name']}\n💰 Narxlar: {len(prices)} ta"))
     await state.clear()
+    await show_main_menu(message)
 
 
 # ============================================================
 # HARIDNI TASDIQLASH (Admin uchun Callback)
 # ============================================================
-# Bu funksiya api.py dan chaqiriladi, foydalanuvchi WebApp da harid qilganda
-async def send_rental_to_admin(rental_id, user_name, acc_name, duration, price, is_first_time):
+async def send_rental_to_admin(rental_id, user_id, user_name, acc_name, duration, price, is_first_time):
     text = (
         f"🆕 <b>YANGI HARID!</b>\n\n"
-        f"👤 Foydalanuvchi: <b>{user_name}</b>\n"
+        f"👤 Foydalanuvchi: <b>{user_name}</b> (ID: {user_id})\n"
         f"🎮 Akkount: <b>{acc_name}</b>\n"
         f"⏳ Vaqt: <b>{duration}</b>\n"
         f"💰 Summa: <b>{price:,} so'm</b>\n\n"
         f"Holat: ⏳ Tasdiqlash kutilmoqda"
     )
-
+    
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="✅ Tasdiqlash", callback_data=f"approve_rent_{rental_id}"),
          InlineKeyboardButton(text="❌ Rad etish", callback_data=f"reject_rent_{rental_id}")]
     ])
-
+    
     await bot.send_message(BOT.ADMIN_ID, pe(text), reply_markup=kb)
-
 
 @dp.callback_query(F.data.startswith("approve_rent_"))
 async def admin_approve_rent(cb: types.CallbackQuery):
     rental_id = int(cb.data.split("_")[-1])
-
+    
     # 2-qadam: Akkountni ulab berdim va User tasdiqlash
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔗 Akkount ulab berdim", callback_data=f"linked_acc_{rental_id}")],
         [InlineKeyboardButton(text="👤 User tasdiqlash (Pasport)", callback_data=f"verify_user_{rental_id}")]
     ])
-
+    
     await cb.message.edit_text(pe("✅ <b>Harid tasdiqlandi!</b>\n\nEndi quyidagi amallarni bajaring:"), reply_markup=kb)
-
 
 @dp.callback_query(F.data.startswith("linked_acc_"))
 async def admin_linked_acc(cb: types.CallbackQuery):
     rental_id = int(cb.data.split("_")[-1])
     now = datetime.now()
-
-    # Bazada vaqtni boshlash
+    
     await db.approve_rental(rental_id, start_time=now)
-
+    
     await cb.message.edit_text(pe("✅ <b>Akkount ulab berildi!</b>\n\nVaqt avtomatik boshlandi."))
-
-    # Foydalanuvchiga xabar yuborish
-    # (Bu qismda foydalanuvchi ID sini olib, unga xabar yuboramiz)
-    # await bot.send_message(user_id, "Akkount sizga ulab berildi...")
-
+    
+    # Foydalanuvchiga xabar
+    async with db.pool.acquire() as conn:
+        r = await conn.fetchrow("SELECT u.tg_id, a.acc_name FROM rentals r JOIN users u ON u.id=r.user_id JOIN accounts a ON a.id=r.account_id WHERE r.id=$1", rental_id)
+        if r:
+            await bot.send_message(r['tg_id'], pe(f"🎉 <b>Akkountingiz ulab berildi!</b>\n\n🎮 {r['acc_name']}"))
 
 @dp.callback_query(F.data.startswith("verify_user_"))
 async def admin_verify_user(cb: types.CallbackQuery, state: FSMContext):
     rental_id = int(cb.data.split("_")[-1])
-    await cb.message.answer(pe("👤 <b>Foydalanuvchi pasportini yuklang!</b>\n\nRasm yoki fayl ko'rinishida yuboring:"))
-    # Bu yerda FSM orqali pasport rasmini qabul qilamiz va db.save_passport() qilamiz
+    await state.update_data(verify_rental_id=rental_id)
+    await cb.message.answer(pe("👤 <b>Foydalanuvchi pasportini yuklang!</b>\n\nRasm ko'rinishida yuboring:"))
+    await state.set_state(AdminStates.upload_passport)
+
+@dp.message(AdminStates.upload_passport, F.photo)
+async def process_passport(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    rental_id = data.get('verify_rental_id')
+    
+    photo_id = message.photo[-1].file_id
+    
+    async with db.pool.acquire() as conn:
+        # User ID ni topish
+        r = await conn.fetchrow("SELECT user_id FROM rentals WHERE id=$1", rental_id)
+        if r:
+            await conn.execute("UPDATE users SET passport_file_id=$1, is_verified=TRUE, checkmark_type='blue' WHERE id=$2", photo_id, r['user_id'])
+            
+            # Foydalanuvchiga xabar
+            u = await conn.fetchrow("SELECT tg_id FROM users WHERE id=$1", r['user_id'])
+            if u:
+                await bot.send_message(u['tg_id'], pe("✅ <b>Profilingiz admin tomonidan tasdiqlandi!</b>\nSizga ko'k galichka berildi."))
+
+    await message.answer(pe("✅ Pasport saqlandi va foydalanuvchi tasdiqlandi!"))
+    await state.clear()
 
 
 # ============================================================
-# START BOT
+# BOTNI ISHGA TUSHIRISH (main.py dan chaqiriladi)
 # ============================================================
-async def main():
-    # Bazaga ulanish
-    await db.connect()
-
-    # Userbotni ishga tushirish (Telethon)
-    await userbot.start()
-
-    # Botni ishga tushirish
+async def start_bot():
     logger.info("🚀 Bot ishga tushdi...")
     await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
