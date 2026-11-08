@@ -8,6 +8,7 @@ Ro'yxatdan o'tish, obuna tekshirish va Web App'ni ochish vazifalarini bajaradi.
 import logging
 import asyncio
 from aiogram import Bot, Dispatcher, F
+from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import CommandStart, Command
 from aiogram.types import (
     Message, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton,
