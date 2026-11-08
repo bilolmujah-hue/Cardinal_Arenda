@@ -60,3 +60,4 @@ class CARDS:
         {"number": "5614682110725894", "holder": "CARDINAL ADMIN"},
         {"number": "5614682513788143", "holder": "CARDINAL ADMIN"},
     ]
+DEFAULT_AD_DAYS = 30
