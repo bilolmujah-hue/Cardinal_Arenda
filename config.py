@@ -37,6 +37,15 @@ class BOT:
     ]
 
 # ============================================================
+# TO'LOV UCHUN KARTALAR (Admin panelda ko'rinadi)
+# ============================================================
+class CARDS:
+    LIST = [
+        {"number": "5614682110725894", "holder": "CARDINAL ADMIN"},
+        {"number": "5614682513788143", "holder": "CARDINAL ADMIN"},
+    ]
+
+# ============================================================
 # USERBOT (TELETHON) - To'lov ushlagich
 # ============================================================
 class USERBOT:
