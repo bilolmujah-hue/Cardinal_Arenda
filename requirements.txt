@@ -1,0 +1,7 @@
+aiogram
+aiohttp
+aiohttp_cors
+asyncpg
+python-dotenv
+telethon
+PyJWT

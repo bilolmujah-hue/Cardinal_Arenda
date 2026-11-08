@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<title>Cardinal Arenda — Premium PUBG Akkauntlar Ijarasi</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   CARDINAL ARENDA - DESIGN SYSTEM & CORE CSS
+   ========================================================================== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;min-height:100vh;min-height:100dvh;overflow-x:hidden}
+body{font-family:'Manrope',-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:calc(96px + env(safe-area-inset-bottom,0));transition:background .3s,color .3s;position:relative;min-height:100vh;min-height:100dvh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 20% 0%, rgba(59,130,246,.14), transparent 45%),radial-gradient(circle at 85% 15%, rgba(6,182,212,.10), transparent 50%),radial-gradient(circle at 50% 100%, rgba(139,92,246,.08), transparent 60%)}
+body.dark::before{background:radial-gradient(circle at 20% 0%, rgba(96,165,250,.16), transparent 45%),radial-gradient(circle at 85% 15%, rgba(34,211,238,.10), transparent 50%),radial-gradient(circle at 50% 100%, rgba(139,92,246,.10), transparent 60%)}
+.app{position:relative;z-index:1}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;letter-spacing:-.02em}
+button,input,select,textarea{font-family:inherit;color:inherit;font-size:inherit}
+button{border:0;background:none;cursor:pointer;color:inherit}
+input,select,textarea{outline:0;border:0;background:none}
+img,video{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+
+:root{
+  --bg:#F5F7FB;--bg-2:rgba(255,255,255,.85);--surface:#FFFFFF;--surface-2:#F3F5FA;--surface-3:#E5E9F2;
+  --border:rgba(15,23,42,.08);--border-2:rgba(15,23,42,.14);--border-3:rgba(15,23,42,.24);
+  --blue:#3B82F6;--blue-2:#2563EB;--cyan:#06B6D4;--sky:#0EA5E9;
+  --text:#0F172A;--text-2:#475569;--text-3:#94A3B8;--text-4:#CBD5E1;
+  --heart:#FF3B6B;--green:#10B981;--amber:#F59E0B;--red:#EF4444;--purple:#8B5CF6;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.06);--shadow:0 4px 16px rgba(15,23,42,.08);--shadow-lg:0 12px 40px rgba(15,23,42,.12);
+  --radius:20px;--radius-sm:14px;--radius-lg:26px;
+  --icon-color:#60A5FA;
+}
+body.dark{
+  --bg:#1A2332;--bg-2:rgba(30,41,58,.85);--surface:#242F44;--surface-2:#2A3852;--surface-3:#334360;
+  --border:rgba(148,163,184,.14);--border-2:rgba(148,163,184,.22);--border-3:rgba(148,163,184,.34);
+  --blue:#60A5FA;--blue-2:#3B82F6;--cyan:#22D3EE;--sky:#38BDF8;
+  --text:#F1F5F9;--text-2:#CBD5E1;--text-3:#94A3B8;--text-4:#64748B;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow:0 4px 16px rgba(0,0,0,.35);--shadow-lg:0 12px 40px rgba(0,0,0,.45);
+  --icon-color:#60A5FA;
+}
+
+svg.ico{width:20px;height:20px;stroke-width:2;stroke:currentColor;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle;display:inline-block}
+svg.ico-sm{width:14px;height:14px;stroke-width:2.2}
+svg.ico-lg{width:28px;height:28px;stroke-width:1.8}
+
+/* Animatsiyalar */
+@keyframes floatSoft{0%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-2px) rotate(-1.2deg)}50%{transform:translateY(-4px) rotate(0deg)}75%{transform:translateY(-2px) rotate(1.2deg)}100%{transform:translateY(0) rotate(0deg)}}
+@keyframes floatIcon{0%{transform:translateY(0) rotate(0deg) scale(1)}30%{transform:translateY(-2.5px) rotate(-2deg) scale(1.03)}60%{transform:translateY(-3.5px) rotate(2deg) scale(1.04)}100%{transform:translateY(0) rotate(0deg) scale(1)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 8px 24px rgba(59,130,246,.35),0 0 0 0 rgba(59,130,246,.35)}50%{box-shadow:0 8px 28px rgba(59,130,246,.5),0 0 0 8px rgba(59,130,246,0)}}
+@keyframes shimmer{0%{transform:translateX(-100%)}55%,100%{transform:translateX(200%)}}
+@keyframes iconWiggle{0%,100%{transform:rotate(0deg) scale(1)}25%{transform:rotate(-6deg) scale(1.05)}75%{transform:rotate(6deg) scale(1.05)}}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulseSoft{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes splashBar{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes splashDot{0%,60%,100%{opacity:.25;transform:translateY(0) scale(.85)}30%{opacity:1;transform:translateY(-6px) scale(1.1)}}
+@keyframes splashBrandIn{0%{opacity:0;transform:translateY(16px) scale(.94);letter-spacing:.3em;filter:blur(8px)}100%{opacity:1;transform:translateY(0) scale(1);letter-spacing:.14em;filter:blur(0)}}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes toastIn{from{opacity:0;transform:translateY(-20px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes heartBeat{0%{transform:scale(1)}30%{transform:scale(1.35)}60%{transform:scale(.92)}100%{transform:scale(1)}}
+
+/* Splash Screen */
+#splash{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity .6s ease, visibility .6s ease}
+#splash::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(96,165,250,.20),transparent 55%),radial-gradient(circle at 80% 80%,rgba(34,211,238,.14),transparent 55%);pointer-events:none}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.splash-brand{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:800;letter-spacing:.14em;color:var(--text);text-align:center;animation:splashBrandIn 1s cubic-bezier(.16,1,.3,1) both}
+.splash-brand .c-blue{background:linear-gradient(135deg,#3B82F6,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.splash-sub{margin-top:12px;font-size:12px;font-weight:600;letter-spacing:.5em;color:var(--text-3);text-transform:uppercase}
+.splash-bar{margin-top:30px;width:160px;height:3px;border-radius:10px;background:var(--surface-3);overflow:hidden;position:relative}
+.splash-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,#3B82F6,#06B6D4,transparent);animation:splashBar 1.5s ease-in-out infinite}
+
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:50;background:var(--bg-2);backdrop-filter:blur(24px) saturate(150%);border-bottom:1px solid var(--border);padding:14px 16px 12px;padding-top:calc(14px + env(safe-area-inset-top,0))}
+.topbar-in{max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.tb-row-1{display:flex;align-items:center;gap:12px}
+.tb-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#3B82F6,#06B6D4);padding:2.5px;flex-shrink:0;overflow:hidden;box-shadow:0 6px 18px rgba(59,130,246,.35)}
+.tb-avatar-in{width:100%;height:100%;border-radius:50%;background:var(--surface);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--blue);font-family:'Space Grotesk',sans-serif}
+.tb-avatar img{width:100%;height:100%;object-fit:cover}
+.tb-name-block{flex:1;min-width:0}
+.tb-hello{font-size:10.5px;font-weight:700;letter-spacing:.16em;color:var(--text-3);text-transform:uppercase;margin-bottom:2px}
+.tb-name{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
+.tb-balance-card{display:flex;align-items:center;gap:12px;padding:12px 14px;background:linear-gradient(135deg,rgba(59,130,246,.10),rgba(6,182,212,.05));border:1.5px solid var(--border-2);border-radius:20px;backdrop-filter:blur(12px)}
+.tb-balance-icon{width:44px;height:44px;flex-shrink:0;border-radius:14px;background:linear-gradient(135deg,#3B82F6,#2563EB);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 20px rgba(59,130,246,.35)}
+.tb-balance-info{flex:1;min-width:0}
+.tb-balance-lbl{font-size:9.5px;font-weight:800;letter-spacing:.16em;color:var(--text-3);text-transform:uppercase;margin-bottom:3px}
+.tb-balance-val{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;color:var(--text);line-height:1.1}
+.tb-balance-val small{font-size:12px;font-weight:700;color:var(--text-2);margin-left:3px}
+.tb-topup-btn{padding:12px 18px;border-radius:14px;background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;box-shadow:0 8px 20px rgba(59,130,246,.40);transition:all .22s}
+.tb-topup-btn:active{transform:scale(.95)}
+
+.container{width:100%;max-width:600px;margin:0 auto;padding:0 16px}
+.page{display:none}
+.page.active{display:block;animation:pageIn .35s cubic-bezier(.16,1,.3,1)}
+.hidden{display:none !important}
+
+/* Pastki Menyu */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:100;padding:0 12px calc(8px + env(safe-area-inset-bottom,0));background:linear-gradient(180deg,transparent,var(--bg) 30%);pointer-events:none}
+.nav-in{max-width:600px;margin:0 auto;background:var(--surface);border:1px solid var(--border-2);border-radius:22px;padding:6px;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;pointer-events:auto;box-shadow:0 -8px 40px rgba(0,0,0,.08)}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;border-radius:16px;color:var(--text-3);font-size:9.5px;font-weight:600;transition:all .2s}
+.nav-btn .nav-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.nav-btn .nav-icon svg{width:22px;height:22px;stroke-width:2}
+.nav-btn.active{color:var(--blue)}
+.nav-btn.active .nav-icon{background:linear-gradient(135deg,rgba(59,130,246,.18),rgba(6,182,212,.08));width:38px;height:30px;border-radius:11px}
+
+/* Akkauntlar (Arenda) */
+.hero{padding:20px 0 8px}
+.hero-title{font-size:24px;font-weight:700;display:flex;align-items:center;gap:10px}
+.hero-title .accent{background:linear-gradient(135deg,#3B82F6,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:13px;color:var(--text-3);margin-top:6px}
+
+.acc-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+.acc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:transform .2s;position:relative;display:flex;flex-direction:column}
+.acc-card:active{transform:scale(.98)}
+.acc-cover{height:160px;background:var(--surface-2);position:relative;overflow:hidden}
+.acc-cover video, .acc-cover img {width:100%;height:100%;object-fit:cover}
+.acc-cover .badge-no{position:absolute;top:12px;left:12px;padding:6px 12px;border-radius:10px;background:rgba(15,23,42,.75);backdrop-filter:blur(10px);color:#fff;font-weight:800;font-size:12px;font-family:'Space Grotesk',sans-serif}
+.acc-body{padding:16px}
+.acc-title{font-size:16px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.acc-desc{font-size:13px;color:var(--text-2);margin-bottom:12px;line-height:1.5;white-space:pre-wrap}
+.acc-prices{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.price-tag{padding:10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--border-2);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .2s}
+.price-tag:active{transform:scale(.95)}
+.price-tag.selected{border-color:var(--blue);background:rgba(59,130,246,.1)}
+.price-tag .hr{font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:2px}
+.price-tag .pr{font-size:14px;font-weight:800;color:var(--blue);font-family:'Space Grotesk',sans-serif}
+
+/* Modallar */
+.modal{position:fixed;inset:0;z-index:500;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center}
+.modal.active{display:flex;animation:fadeIn .2s}
+.modal-in{width:100%;max-width:600px;max-height:90vh;background:var(--bg-2);border-radius:24px 24px 0 0;overflow-y:auto;padding:20px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0));animation:slideUp .35s cubic-bezier(.16,1,.3,1);backdrop-filter:blur(24px)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-head h2{font-size:19px;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--text)}
+.modal-close{width:36px;height:36px;border-radius:12px;background:var(--surface-2);border:1px solid var(--border-2);display:flex;align-items:center;justify-content:center}
+.modal-handle{width:40px;height:4px;border-radius:10px;background:var(--surface-3);margin:0 auto 12px}
+
+/* To'lov (Topup) */
+.amount-wrap{position:relative;margin-bottom:14px}
+.amount-input{width:100%;padding:22px 66px 22px 22px;background:var(--surface);border:2px solid var(--border-2);border-radius:18px;font-size:24px;font-weight:800;text-align:center;color:var(--text);font-family:'Space Grotesk',sans-serif}
+.amount-cur{position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:700;color:var(--text-3)}
+.quick-amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.quick-amount{padding:12px 8px;border-radius:13px;background:var(--surface-2);border:1.5px solid var(--border-2);font-size:12.5px;font-weight:700;color:var(--text-2)}
+.quick-amount.active{background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;border-color:transparent}
+
+.pay-card{padding:22px;border-radius:18px;background:linear-gradient(135deg,#0F172A,#1E293B);color:#fff;position:relative;overflow:hidden;margin-top:16px}
+.pay-card-lbl{font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;opacity:.7}
+.pay-card-num{font-size:20px;font-weight:800;font-family:'Space Grotesk',monospace;letter-spacing:1.5px;color:#93C5FD}
+.pay-card-holder{margin-top:10px;font-size:12.5px;font-weight:600;color:#E2E8F0;text-transform:uppercase}
+.pay-card-amt{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15);font-size:13px}
+.pay-timer{margin-top:16px;font-size:32px;font-weight:800;text-align:center;color:#3B82F6;font-family:'Space Grotesk',sans-serif}
+.pay-timer.warn{color:#EF4444;animation:pulseSoft 1s infinite}
+
+/* Admin Panel */
+.admin-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.admin-stat{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px}
+.admin-stat-val{font-size:24px;font-weight:800;font-family:'Space Grotesk',sans-serif;background:linear-gradient(135deg,#3B82F6,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:8px}
+.admin-stat-lbl{font-size:11px;color:var(--text-3);font-weight:600;margin-top:4px}
+.admin-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0;margin-bottom:14px;scrollbar-width:none}
+.admin-tab{flex-shrink:0;padding:10px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;font-size:12px;font-weight:700;color:var(--text-2);display:flex;align-items:center;gap:6px;white-space:nowrap;transition:all .2s}
+.admin-tab.active{background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;border-color:transparent}
+
+/* Formalar */
+.field{margin-bottom:16px}
+.label{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--text-2);margin-bottom:8px}
+.input,.select,.textarea{width:100%;padding:14px 16px;background:var(--surface);border:1.5px solid var(--border-2);border-radius:14px;color:var(--text);font-size:14px;font-weight:500;transition:all .2s}
+.input:focus{border-color:#3B82F6;box-shadow:0 0 0 4px rgba(59,130,246,.1)}
+.textarea{resize:vertical;min-height:100px;line-height:1.6}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:700;transition:transform .18s;width:100%}
+.btn:active{transform:scale(.95)}
+.btn-primary{background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;box-shadow:0 8px 24px rgba(59,130,246,.35)}
+.btn-success{background:linear-gradient(135deg,#10B981,#059669);color:#fff}
+.btn-danger{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff}
+.btn-secondary{background:var(--surface-2);border:1px solid var(--border-2);color:var(--text)}
+.btn-ghost{background:rgba(59,130,246,.08);border:1px solid var(--border-2);color:var(--blue)}
+
+/* Toast */
+.toast-wrap{position:fixed;top:14px;left:14px;right:14px;z-index:1100;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding-top:env(safe-area-inset-top,0)}
+.toast{background:var(--surface);border:1px solid var(--border-3);padding:12px 18px;border-radius:14px;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:8px;animation:toastIn .4s;color:var(--text)}
+.toast.success{border-color:rgba(16,185,129,.4)}
+.toast.error{border-color:rgba(239,68,68,.4)}
+
+/* Passport Upload */
+.upload-area{border:2px dashed var(--border-3);border-radius:20px;padding:30px;text-align:center;transition:all .2s;cursor:pointer;background:var(--surface-2)}
+.upload-area:active{border-color:var(--blue);background:rgba(59,130,246,.05)}
+.upload-area svg{width:40px;height:40px;color:var(--blue);margin:0 auto 10px}
+.upload-area p{font-size:13px;color:var(--text-2);font-weight:600}
+
+/* List Items */
+.list-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:10px}
+.list-item-ic{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(59,130,246,.15),rgba(6,182,212,.05));display:flex;align-items:center;justify-content:center;color:var(--blue)}
+.list-item-info{flex:1}
+.list-item-title{font-size:14px;font-weight:700;color:var(--text)}
+.list-item-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+.list-item-action{padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="splash-brand">CARDINAL <span class="c-blue">ARENDA</span></div>
+  <div class="splash-sub">PREMIUM PUBG RENT</div>
+  <div class="splash-bar"></div>
+</div>
+
+<!-- SVG ICONLAR -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="i-mega" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+    <symbol id="i-arrow-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 4 20 12 6 20"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h20l-2-10-4 4-4-8-4 8-4-4z"/><path d="M2 18v3h20v-3"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="tb-row-1">
+        <div class="tb-avatar"><div class="tb-avatar-in" id="brandAv">A</div></div>
+        <div class="tb-name-block">
+          <div class="tb-hello">Xush kelibsiz,</div>
+          <div class="tb-name" id="brandN">Yuklanmoqda...</div>
+        </div>
+        <button class="tb-theme" onclick="toggleTheme()" style="width:40px;height:40px;border-radius:12px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--text-2)">
+          <svg class="ico"><use href="#i-settings"/></svg>
+        </button>
+      </div>
+      <div class="tb-balance-card">
+        <div class="tb-balance-icon"><svg class="ico"><use href="#i-wallet"/></svg></div>
+        <div class="tb-balance-info">
+          <div class="tb-balance-lbl">Balansingiz</div>
+          <div class="tb-balance-val"><span id="balVal">0</span><small>so'm</small></div>
+        </div>
+        <button class="tb-topup-btn" onclick="openTopup()">
+          <svg class="ico"><use href="#i-plus"/></svg>To'ldirish
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       SAHIFA 1: ASOSIY (AKKAUNTLAR)
+       ========================================== -->
+  <section class="page active" id="pageHome">
+    <div class="container">
+      <div class="hero">
+        <h1 class="hero-title">PUBG <span class="accent">Arenda</span></h1>
+        <p class="hero-sub">O'zingizga mos akkauntni tanlang va vaqtga ijaraga oling</p>
+      </div>
+      <div class="acc-grid" id="accountsGrid">
+        <!-- Dinamik to'ldiriladi -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SAHIFA 2: MENING ARENDALARIM
+       ========================================== -->
+  <section class="page" id="pageRentals">
+    <div class="container">
+      <div class="hero">
+        <h1 class="hero-title">Mening <span class="accent">Arendalarim</span></h1>
+        <p class="hero-sub">Aktiv va o'tgan arendalar tarixi</p>
+      </div>
+
+      <div class="admin-tabs" style="margin-top:16px">
+        <button class="admin-tab active" onclick="switchRentalTab('active')">Aktiv</button>
+        <button class="admin-tab" onclick="switchRentalTab('history')">Tarix</button>
+      </div>
+
+      <div id="rentalsActiveList">
+        <!-- Aktiv arendalar -->
+      </div>
+      <div id="rentalsHistoryList" class="hidden">
+        <!-- Tarix -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SAHIFA 3: REYTING (TOP 50)
+       ========================================== -->
+  <section class="page" id="pageLeaderboard">
+    <div class="container">
+      <div class="hero">
+        <h1 class="hero-title">Top <span class="accent">Reyting</span></h1>
+        <p class="hero-sub">Eng ko'p pul to'ldirgan foydalanuvchilar</p>
+      </div>
+
+      <div class="admin-tabs" style="margin-top:16px">
+        <button class="admin-tab active" onclick="loadLeaderboard('week')">1 Hafta</button>
+        <button class="admin-tab" onclick="loadLeaderboard('month')">1 Oy</button>
+        <button class="admin-tab" onclick="loadLeaderboard('all')">Butunlay</button>
+      </div>
+
+      <div style="background:var(--surface);border-radius:20px;padding:16px;margin-top:16px" id="leaderboardList">
+        <!-- Top 50 Dinamik -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SAHIFA 4: PROFIL
+       ========================================== -->
+  <section class="page" id="pageProfile">
+    <div class="container">
+      <div class="hero"><h1 class="hero-title">Mening <span class="accent">Profilim</span></h1></div>
+
+      <div class="card-box" style="background:var(--surface); border-radius:20px; padding:20px; margin-top:16px; text-align:center; border:1px solid var(--border)">
+        <div style="position:relative;width:90px;height:90px;margin:0 auto 16px">
+          <div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#3B82F6,#06B6D4);padding:3px">
+             <div style="width:100%;height:100%;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff;font-weight:800;overflow:hidden" id="profAvatar">A</div>
+          </div>
+          <div id="profBadge" class="hidden" style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:#3B82F6;border:3px solid var(--surface);display:flex;align-items:center;justify-content:center;color:#fff">
+            <svg class="ico ico-sm"><use href="#i-check"/></svg>
+          </div>
+        </div>
+
+        <h2 style="font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px" id="profName">Ism</h2>
+        <div style="font-size:13px;color:var(--text-3);margin-top:4px" id="profPhone">+998 -- --- -- --</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px">
+          <div style="padding:12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-2)">
+            <div style="font-size:18px;font-weight:800;color:var(--blue)" id="profBal">0</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase">Balans</div>
+          </div>
+          <div style="padding:12px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-2)">
+            <div style="font-size:18px;font-weight:800;color:var(--green)" id="profRents">0</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase">Arendalar</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="list-item" onclick="uploadPassport()">
+          <div class="list-item-ic" style="background:rgba(59,130,246,.15);color:#3B82F6">
+            <svg class="ico"><use href="#i-image"/></svg>
+          </div>
+          <div class="list-item-info">
+            <div class="list-item-title">Pasport yuklash</div>
+            <div class="list-item-sub">Ko'k galichka olish uchun</div>
+          </div>
+          <div class="list-item-action" style="background:var(--surface-2)">Yuklash</div>
+        </div>
+
+        <div class="list-item" onclick="location.reload()">
+          <div class="list-item-ic" style="background:rgba(239,68,68,.15);color:#EF4444">
+            <svg class="ico"><use href="#i-x"/></svg>
+          </div>
+          <div class="list-item-info">
+            <div class="list-item-title">Chiqish</div>
+            <div class="list-item-sub">Tizimdan chiqish</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SAHIFA 5: ADMIN PANEL (MUKAMMAL)
+       ========================================== -->
+  <section class="page" id="pageAdmin">
+    <div class="container">
+      <div class="hero">
+        <h1 class="hero-title">Admin <span class="accent">Panel</span></h1>
+        <p class="hero-sub">Tizimni to'liq boshqarish markazi</p>
+      </div>
+
+      <!-- Statistika -->
+      <div class="admin-stat-grid">
+        <div class="admin-stat">
+          <div class="admin-stat-val" id="statUsers">0</div>
+          <div class="admin-stat-lbl">Foydalanuvchilar</div>
+        </div>
+        <div class="admin-stat">
+          <div class="admin-stat-val" id="statRents">0</div>
+          <div class="admin-stat-lbl">Aktiv Arendalar</div>
+        </div>
+        <div class="admin-stat">
+          <div class="admin-stat-val" id="statPending">0</div>
+          <div class="admin-stat-lbl">Kutilayotganlar</div>
+        </div>
+        <div class="admin-stat">
+          <div class="admin-stat-val" id="statBal">0</div>
+          <div class="admin-stat-lbl">Jami Balans</div>
+        </div>
+      </div>
+
+      <!-- Tablar -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('rents')">Arendalar</button>
+        <button class="admin-tab" onclick="switchAdminTab('accs')">Akkauntlar</button>
+        <button class="admin-tab" onclick="switchAdminTab('users')">Userlar</button>
+        <button class="admin-tab" onclick="switchAdminTab('userbot')">Userbot</button>
+      </div>
+
+      <!-- Tab 1: Arendalar -->
+      <div id="adminRents">
+        <h3 style="font-size:14px;margin-bottom:10px;color:var(--text-2)">Tasdiqlash kutilmoqda</h3>
+        <div id="pendingRentalsList"></div>
+      </div>
+
+      <!-- Tab 2: Akkauntlar -->
+      <div id="adminAccs" class="hidden">
+        <button class="btn btn-primary" onclick="openAddAccountModal()" style="margin-bottom:16px">
+          <svg class="ico"><use href="#i-plus"/></svg>Yangi Akkaunt Qo'shish
+        </button>
+        <div id="adminAccountsList"></div>
+      </div>
+
+      <!-- Tab 3: Userlar -->
+      <div id="adminUsers" class="hidden">
+        <div class="field" style="margin-bottom:12px">
+           <input class="input" placeholder="Ism yoki ID orqali qidirish..." oninput="searchUsers(this.value)">
+        </div>
+        <div id="adminUsersList"></div>
+      </div>
+
+      <!-- Tab 4: Userbot (Avto To'lov) -->
+      <div id="adminUserbot" class="hidden">
+        <div style="background:var(--surface);padding:20px;border-radius:20px;border:1px solid var(--border)">
+          <h3 style="margin-bottom:14px;display:flex;align-items:center;gap:8px">
+            <svg class="ico" style="color:var(--blue)"><use href="#i-phone"/></svg>
+            Userbot Boshqaruvi
+          </h3>
+          <div id="ubStatus" style="padding:12px;border-radius:12px;background:var(--surface-2);text-align:center;font-size:13px;font-weight:600;margin-bottom:14px">
+            Tekshirilmoqda...
+          </div>
+
+          <div id="ubForm" class="hidden">
+            <div class="field">
+              <label class="label">Telefon Raqam</label>
+              <input class="input" id="ubPhone" placeholder="+998901234567">
+            </div>
+            <button class="btn btn-primary" onclick="userbotSendCode()">Kod Yuborish</button>
+          </div>
+
+          <div id="ubCodeForm" class="hidden">
+            <div class="field">
+              <label class="label">Telegramdan kelgan kod</label>
+              <input class="input" id="ubCode" placeholder="12345">
+            </div>
+            <button class="btn btn-success" onclick="userbotVerifyCode()">Tasdiqlash</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASTKI MENYU -->
+  <nav class="nav">
+    <div class="nav-in">
+      <button class="nav-btn active" onclick="go('pageHome')">
+        <div class="nav-icon"><svg class="ico"><use href="#i-home"/></svg></div><span>Asosiy</span>
+      </button>
+      <button class="nav-btn" onclick="go('pageRentals')">
+        <div class="nav-icon"><svg class="ico"><use href="#i-clock"/></svg></div><span>Arendalarim</span>
+      </button>
+      <button class="nav-btn" onclick="go('pageLeaderboard')">
+        <div class="nav-icon"><svg class="ico"><use href="#i-crown"/></svg></div><span>Reyting</span>
+      </button>
+      <button class="nav-btn" onclick="go('pageProfile')">
+        <div class="nav-icon"><svg class="ico"><use href="#i-user"/></svg></div><span>Profil</span>
+      </button>
+      <button class="nav-btn hidden" id="navAdmin" onclick="go('pageAdmin')">
+        <div class="nav-icon"><svg class="ico"><use href="#i-shield"/></svg></div><span>Admin</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- ==========================================
+     MODALLAR (Oynalar)
+     ========================================== -->
+
+<!-- Arenda Qilish Modali -->
+<div class="modal" id="mRent">
+  <div class="modal-in">
+    <div class="modal-handle"></div>
+    <div class="modal-head"><h2 id="rentTitle">Vaqtni Tanlang</h2><button class="modal-close" onclick="closeModal('mRent')"><svg class="ico"><use href="#i-x"/></svg></button></div>
+    <div id="rentBody"></div>
+  </div>
+</div>
+
+<!-- To'lov Modali (10 daqiqalik taymer) -->
+<div class="modal" id="mTopup">
+  <div class="modal-in">
+    <div class="modal-handle"></div>
+    <div class="modal-head"><h2>Hisobni To'ldirish</h2><button class="modal-close" onclick="cancelTopup()"><svg class="ico"><use href="#i-x"/></svg></button></div>
+
+    <!-- Qadam 1: Summa -->
+    <div id="topupStep1">
+      <div class="amount-wrap">
+        <input class="amount-input" id="topupAmt" inputmode="numeric" placeholder="0">
+        <span class="amount-cur">so'm</span>
+      </div>
+      <div class="quick-amounts">
+        <button class="quick-amount" onclick="setAmount(10000, this)">10 000</button>
+        <button class="quick-amount" onclick="setAmount(50000, this)">50 000</button>
+        <button class="quick-amount" onclick="setAmount(100000, this)">100 000</button>
+      </div>
+      <button class="btn btn-primary" style="margin-top:20px" onclick="createTopup()">Davom etish</button>
+    </div>
+
+    <!-- Qadam 2: To'lov va Chek -->
+    <div id="topupStep2" class="hidden">
+      <div class="pay-card">
+        <div class="pay-card-lbl">To'lov uchun karta</div>
+        <div class="pay-card-num" id="payCardNum">---- ---- ---- ----</div>
+        <div class="pay-card-holder" id="payCardHolder">CARDINAL ADMIN</div>
+        <div class="pay-card-amt">Summa: <b id="payAmt">0</b> so'm</div>
+      </div>
+      <div class="pay-timer" id="payTimer">10:00</div>
+      <div style="text-align:center;font-size:12px;color:var(--text-3);margin-bottom:16px">Pulni o'tkazing va pastdagi tugma orqali chekni yuklang</div>
+
+      <input type="file" id="receiptInput" accept="image/*" hidden onchange="uploadReceipt(this)">
+      <button class="btn btn-success" onclick="document.getElementById('receiptInput').click()">
+        <svg class="ico"><use href="#i-image"/></svg> Chekni Yuklash
+      </button>
+      <button class="btn btn-secondary" style="margin-top:10px" onclick="cancelTopup()">Bekor qilish</button>
+    </div>
+
+    <!-- Qadam 3: Tasdiqlanmoqda -->
+    <div id="topupStep3" class="hidden" style="text-align:center;padding:20px 0">
+      <div style="width:60px;height:60px;border-radius:50%;border:4px solid var(--surface-3);border-top-color:var(--blue);margin:0 auto 16px;animation:spin 1s linear infinite"></div>
+      <h3 style="font-size:18px;margin-bottom:8px">Tekshirilmoqda...</h3>
+      <p style="font-size:13px;color:var(--text-3)">Userbot to'lovni qabul qilishi bilan balansingizga qo'shiladi.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Admin: Akkaunt Qo'shish Modali -->
+<div class="modal" id="mAddAcc">
+  <div class="modal-in">
+    <div class="modal-handle"></div>
+    <div class="modal-head"><h2>Yangi Akkaunt Qo'shish</h2><button class="modal-close" onclick="closeModal('mAddAcc')"><svg class="ico"><use href="#i-x"/></svg></button></div>
+
+    <div class="field">
+      <label class="label">Akkaunt Raqami (ID)</label>
+      <input class="input" id="addAccNo" type="number" placeholder="1">
+    </div>
+    <div class="field">
+      <label class="label">Akkaunt Nomi</label>
+      <input class="input" id="addAccTitle" placeholder="Premium PUBG #1">
+    </div>
+    <div class="field">
+      <label class="label">Ma'lumot (Emojilar bilan)</label>
+      <textarea class="textarea" id="addAccDesc" rows="4" placeholder="Mifik kiyimlar: 50+&#10;RP: S2 sezondan..."></textarea>
+    </div>
+    <div class="field">
+      <label class="label">Narxlar (JSON formatida)</label>
+      <input class="input" id="addAccPrices" placeholder='{"2": 25000, "4": 45000, "night": 70000}'>
+    </div>
+    <button class="btn btn-primary" onclick="adminAddAccount()">Saqlash</button>
+  </div>
+</div>
+
+<!-- Global Toast -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ============================================================================
+// CARDINAL ARENDA - FRONTEND LOGIKASI (3000+ QATORLIK TIZIMNING MIYASI)
+// ============================================================================
+
+const API_URL = "https://cardinal-arenda-production.up.railway.app"; // Railway manzilingiz
+const tg = window.Telegram?.WebApp;
+
+// Global State
+let TOKEN = null;
+let USER = null;
+let IS_ADMIN = false;
+let S = {
+    accounts: [],
+    rentals: { active: [], history: [] },
+    admin: { users: [] },
+    topupTimer: null,
+    topupPoll: null
+};
+
+// Helpers
+const $ = id => document.getElementById(id);
+const esc = s => !s ? "" : String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const num = n => (Number(n)||0).toLocaleString("uz-UZ");
+
+// ==========================================
+// 1. UI FUNKSIYALARI (Toast, Modal, Theme)
+// ==========================================
+function toast(msg, type="info") {
+    const t = document.createElement("div");
+    t.className = "toast " + type;
+    t.innerHTML = `<span>${esc(msg)}</span>`;
+    $("toastWrap").appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+}
+
+function go(pageId) {
+    document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === pageId));
+    document.querySelectorAll(".nav-btn").forEach(b => {
+        b.classList.toggle("active", b.getAttribute('onclick')?.includes(pageId));
+    });
+    window.scrollTo(0,0);
+
+    // Sahifaga qarab ma'lumotlarni yuklash
+    if(pageId === 'pageRentals') loadMyRentals();
+    if(pageId === 'pageLeaderboard') loadLeaderboard('week');
+    if(pageId === 'pageAdmin') loadAdminData();
+}
+
+function closeModal(id) { $(id).classList.remove("active"); document.body.style.overflow = ""; }
+function openModal(id) { $(id).classList.add("active"); document.body.style.overflow = "hidden"; }
+
+function toggleTheme() {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+}
+
+// ==========================================
+// 2. API BILAN ISHLASH
+// ==========================================
+async function api(path, method="GET", body=null) {
+    const h = {"Content-Type":"application/json"};
+    if(TOKEN) h["Authorization"] = "Bearer " + TOKEN;
+    const r = await fetch(API_URL + path, { method, headers: h, body: body ? JSON.stringify(body) : null });
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error || "Xatolik yuz berdi");
+    return d;
+}
+
+// ==========================================
+// 3. INIT VA AUTH (Tizimga kirish)
+// ==========================================
+async function init() {
+    // Theme yuklash
+    if(localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+    if(!tg) { toast("Telegram WebApp da oching!", "error"); return; }
+    tg.ready(); tg.expand();
+
+    const u = tg.initDataUnsafe.user;
+    if(!u) return;
+
+    try {
+        // Backendga kirish so'rovi
+        const res = await api("/api/auth/telegram", "POST", { user: u });
+        TOKEN = res.token;
+        USER = res.user;
+        IS_ADMIN = res.user.is_admin;
+
+        // UI ni yangilash
+        $("brandN").innerText = USER.first_name;
+        $("brandAv").innerText = USER.first_name[0].toUpperCase();
+        $("balVal").innerText = num(USER.balance);
+
+        $("profName").innerText = USER.first_name;
+        $("profAvatar").innerText = USER.first_name[0].toUpperCase();
+        $("profBal").innerText = num(USER.balance);
+
+        if(USER.badge === 'blue') $("profBadge").classList.remove("hidden");
+
+        if(IS_ADMIN) $("navAdmin").classList.remove("hidden");
+
+        // Ma'lumotlarni yuklash
+        await loadAccounts();
+
+        // Splashni yashirish
+        setTimeout(() => $("splash").classList.add("hide"), 1200);
+    } catch(e) {
+        toast(e.message, "error");
+        setTimeout(() => $("splash").classList.add("hide"), 1500);
+    }
+}
+
+// ==========================================
+// 4. AKKOUNTLAR (ASOSIY SAHIFA)
+// ==========================================
+async function loadAccounts() {
+    try {
+        const res = await api("/api/accounts");
+        S.accounts = res.accounts;
+        renderAccounts();
+    } catch(e) { toast(e.message, "error"); }
+}
+
+function renderAccounts() {
+    const g = $("accountsGrid");
+    if(!S.accounts.length) {
+        g.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-3)">Hozircha akkauntlar yo'q</div>`;
+        return;
+    }
+
+    g.innerHTML = S.accounts.map(a => `
+        <div class="acc-card" onclick="openRentModal(${a.id})">
+            <div class="acc-cover">
+                <div class="badge-no">#${a.account_no}</div>
+                <div style="width:100%;height:100%;background:linear-gradient(45deg,#1e293b,#0f172a);display:flex;align-items:center;justify-content:center;color:#fff">
+                    <svg class="ico ico-lg" style="width:40px;height:40px"><use href="#i-play"/></svg>
+                </div>
+            </div>
+            <div class="acc-body">
+                <div class="acc-title">${esc(a.title)}</div>
+                <div class="acc-desc">${esc(a.description || "Ma'lumot kiritilmagan")}</div>
+                <div class="acc-prices">
+                    ${a.prices['2'] ? `<div class="price-tag"><span class="hr">2 Soat</span><span class="pr">${num(a.prices['2'])}</span></div>` : ''}
+                    ${a.prices['4'] ? `<div class="price-tag"><span class="hr">4 Soat</span><span class="pr">${num(a.prices['4'])}</span></div>` : ''}
+                </div>
+                <button class="btn btn-primary" style="padding:10px">Ijaraga Olish</button>
+            </div>
+        </div>
+    `).join("");
+}
+
+// ==========================================
+// 5. ARENDA QILISH LOGIKASI (RENT)
+// ==========================================
+let currentAcc = null;
+
+function openRentModal(id) {
+    currentAcc = S.accounts.find(a => a.id === id);
+    if(!currentAcc) return;
+
+    $("rentTitle").innerText = `#${currentAcc.account_no} - Vaqtni Tanlang`;
+
+    let priceHtml = "";
+    const p = currentAcc.prices;
+
+    if(p['2']) priceHtml += `<div class="price-tag" onclick="selectRentTime(2, ${p['2']}, this)"><span class="hr">2 Soat</span><span class="pr">${num(p['2'])}</span></div>`;
+    if(p['4']) priceHtml += `<div class="price-tag" onclick="selectRentTime(4, ${p['4']}, this)"><span class="hr">4 Soat</span><span class="pr">${num(p['4'])}</span></div>`;
+    if(p['12']) priceHtml += `<div class="price-tag" onclick="selectRentTime(12, ${p['12']}, this)"><span class="hr">12 Soat</span><span class="pr">${num(p['12'])}</span></div>`;
+    if(p['24']) priceHtml += `<div class="price-tag" onclick="selectRentTime(24, ${p['24']}, this)"><span class="hr">24 Soat</span><span class="pr">${num(p['24'])}</span></div>`;
+    if(p['night']) priceHtml += `<div class="price-tag" onclick="selectRentTime(11, ${p['night']}, this)"><span class="hr">Tungi (21:00-08:00)</span><span class="pr">${num(p['night'])}</span></div>`;
+
+    $("rentBody").innerHTML = `
+        <div style="font-size:13px;color:var(--text-2);margin-bottom:16px;text-align:center">
+            ${esc(currentAcc.description)}
+        </div>
+        <div class="acc-prices" style="grid-template-columns:repeat(2,1fr)">
+            ${priceHtml}
+        </div>
+        <div style="margin-top:20px;padding:12px;background:rgba(59,130,246,.1);border-radius:12px;text-align:center;font-size:12px;color:var(--blue)">
+            Vaqtni tanlaganingizdan so'ng pul balansingizdan yechiladi va Admin tasdiqlashini kutadi.
+        </div>
+    `;
+    openModal("mRent");
+}
+
+async function selectRentTime(hours, price, el) {
+    // UI ni yangilash
+    document.querySelectorAll('#rentBody .price-tag').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+
+    if(USER.balance < price) {
+        toast("Balansingizda mablag' yetarli emas!", "error");
+        closeModal("mRent");
+        openTopup();
+        return;
+    }
+
+    const confirm = await new Promise(res => {
+        if(window.confirm(`${hours} soat uchun ${num(price)} so'm yechiladi. Tasdiqlaysizmi?`)) res(true);
+        else res(false);
+    });
+
+    if(!confirm) return;
+
+    try {
+        const res = await api("/api/rentals/create", "POST", {
+            account_id: currentAcc.id,
+            hours: hours,
+            price: price,
+            start_time: new Date().toISOString()
+        });
+
+        toast("So'rov yuborildi. Admin tasdiqlashini kuting.", "success");
+        USER.balance = res.new_balance;
+        $("balVal").innerText = num(USER.balance);
+        $("profBal").innerText = num(USER.balance);
+        closeModal("mRent");
+        go('pageRentals'); // Arendalarim bo'limiga o'tish
+    } catch(e) {
+        toast(e.message, "error");
+    }
+}
+
+// ==========================================
+// 6. MENING ARENDALARIM
+// ==========================================
+async function loadMyRentals() {
+    try {
+        const res = await api("/api/rentals/my");
+        S.rentals = res.rentals;
+
+        // Aktiv va Tarixga ajratish
+        S.rentals.active = S.rentals.filter(r => r.status === 'ACTIVE' || r.status === 'PENDING');
+        S.rentals.history = S.rentals.filter(r => r.status !== 'ACTIVE' && r.status !== 'PENDING');
+
+        renderRentals();
+    } catch(e) { toast(e.message, "error"); }
+}
+
+function renderRentals() {
+    // Aktiv
+    const activeList = $("rentalsActiveList");
+    if(!S.rentals.active.length) {
+        activeList.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-3)">Aktiv arendalar yo'q</div>`;
+    } else {
+        activeList.innerHTML = S.rentals.active.map(r => `
+            <div class="list-item">
+                <div class="list-item-ic" style="background:${r.status === 'ACTIVE' ? 'rgba(16,185,129,.15)' : 'rgba(245,158,11,.15)'};color:${r.status === 'ACTIVE' ? '#10B981' : '#F59E0B'}">
+                    <svg class="ico"><use href="#i-${r.status === 'ACTIVE' ? 'check-circle' : 'clock'}"/></svg>
+                </div>
+                <div class="list-item-info">
+                    <div class="list-item-title">Akkaunt #${r.account_no}</div>
+                    <div class="list-item-sub">${r.status === 'ACTIVE' ? 'Faol' : 'Admin tasdiqlashi kutilmoqda'}</div>
+                </div>
+                <div style="font-size:12px;font-weight:700;color:var(--text-2)">${num(r.price)} so'm</div>
+            </div>
+        `).join("");
+    }
+
+    // Tarix
+    const histList = $("rentalsHistoryList");
+    if(!S.rentals.history.length) {
+        histList.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-3)">Tarix bo'sh</div>`;
+    } else {
+        histList.innerHTML = S.rentals.history.map(r => `
+            <div class="list-item" style="opacity:.7">
+                <div class="list-item-ic" style="background:var(--surface-3)">
+                    <svg class="ico"><use href="#i-clock"/></svg>
+                </div>
+                <div class="list-item-info">
+                    <div class="list-item-title">Akkaunt #${r.account_no}</div>
+                    <div class="list-item-sub">${new Date(r.start_time).toLocaleDateString()} - ${new Date(r.end_time).toLocaleDateString()}</div>
+                </div>
+                <div style="font-size:12px;font-weight:700;color:var(--text-2)">${num(r.price)} so'm</div>
+            </div>
+        `).join("");
+    }
+}
+
+function switchRentalTab(tab) {
+    document.querySelectorAll("#pageRentals .admin-tab").forEach(t => t.classList.remove("active"));
+    event.target.classList.add("active");
+    $("rentalsActiveList").classList.toggle("hidden", tab !== 'active');
+    $("rentalsHistoryList").classList.toggle("hidden", tab !== 'history');
+}
+
+// ==========================================
+// 7. REYTING (LEADERBOARD)
+// ==========================================
+async function loadLeaderboard(period) {
+    document.querySelectorAll("#pageLeaderboard .admin-tab").forEach(t => t.classList.remove("active"));
+    event.target.classList.add("active");
+
+    try {
+        const res = await api(`/api/leaderboard?period=${period}`);
+        const list = $("leaderboardList");
+
+        if(!res.leaderboard.length) {
+            list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-3)">Ma'lumot yo'q</div>`;
+            return;
+        }
+
+        list.innerHTML = res.leaderboard.map((u, i) => {
+            let badge = "";
+            if(i === 0) badge = `<span style="color:#000;font-size:18px">🖤</span>`;
+            else if(i === 1) badge = `<span style="color:#F59E0B;font-size:18px">⭐</span>`;
+            else if(u.badge === 'blue') badge = `<span style="color:#3B82F6;font-size:18px">✔️</span>`;
+
+            return `
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+                <div style="width:30px;font-weight:800;color:var(--text-3);font-size:14px">#${i+1}</div>
+                <div style="flex:1;font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px">
+                    ${esc(u.first_name)} ${badge}
+                </div>
+                <div style="font-weight:800;color:var(--blue);font-size:14px">${num(u.total_amount)} so'm</div>
+            </div>
+            `;
+        }).join("");
+    } catch(e) { toast(e.message, "error"); }
+}
+
+// ==========================================
+// 8. BALANS TO'LDIRISH (TOPUP VA TIMER)
+// ==========================================
+function openTopup() {
+    $("topupStep1").classList.remove("hidden");
+    $("topupStep2").classList.add("hidden");
+    $("topupStep3").classList.add("hidden");
+    $("topupAmt").value = "";
+    document.querySelectorAll(".quick-amount").forEach(q => q.classList.remove("active"));
+    openModal("mTopup");
+}
+
+function setAmount(amt, el) {
+    $("topupAmt").value = num(amt);
+    document.querySelectorAll(".quick-amount").forEach(q => q.classList.remove("active"));
+    el.classList.add("active");
+}
+
+async function createTopup() {
+    const amt = +(($("topupAmt").value).replace(/\D/g, "")) || 0;
+    if(amt < 5000) { toast("Minimal 5000 so'm", "error"); return; }
+
+    try {
+        const res = await api("/api/topups/create", "POST", { amount: amt });
+
+        $("topupStep1").classList.add("hidden");
+        $("topupStep2").classList.remove("hidden");
+
+        $("payCardNum").innerText = res.card_number.replace(/(\d{4})/g, '$1 ').trim();
+        $("payCardHolder").innerText = res.card_holder;
+        $("payAmt").innerText = num(res.amount);
+
+        startTopupTimer(res.timeout_min * 60);
+        startTopupPoll();
+    } catch(e) {
+        toast(e.message, "error");
+    }
+}
+
+function startTopupTimer(seconds) {
+    if(S.topupTimer) clearInterval(S.topupTimer);
+    let left = seconds;
+
+    $("payTimer").classList.remove("warn");
+    $("payTimer").innerText = `${String(Math.floor(left/60)).padStart(2,'0')}:${String(left%60).padStart(2,'0')}`;
+
+    S.topupTimer = setInterval(() => {
+        left--;
+        if(left <= 0) {
+            clearInterval(S.topupTimer);
+            $("payTimer").innerText = "00:00";
+            toast("To'lov vaqti tugadi", "error");
+            cancelTopup();
+            return;
+        }
+        const m = String(Math.floor(left / 60)).padStart(2, '0');
+        const s = String(left % 60).padStart(2, '0');
+        $("payTimer").innerText = `${m}:${s}`;
+        if(left < 60) $("payTimer").classList.add("warn");
+    }, 1000);
+}
+
+function startTopupPoll() {
+    if(S.topupPoll) clearInterval(S.topupPoll);
+    S.topupPoll = setInterval(async () => {
+        try {
+            const res = await api("/api/topups/status");
+            if(res.status === "COMPLETED") {
+                clearInterval(S.topupPoll);
+                clearInterval(S.topupTimer);
+                USER.balance = res.balance;
+                $("balVal").innerText = num(USER.balance);
+                $("profBal").innerText = num(USER.balance);
+                toast("To'lov qabul qilindi!", "success");
+
+                // Qadam 3 ni ko'rsatish
+                $("topupStep2").classList.add("hidden");
+                $("topupStep3").classList.remove("hidden");
+                setTimeout(() => { closeModal("mTopup"); }, 2000);
+            }
+        } catch(e) {}
+    }, 3000);
+}
+
+async function uploadReceipt(input) {
+    const file = input.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            await api("/api/topups/receipt", "POST", {
+                receipt_img: e.target.result
+            });
+            toast("Chek yuborildi. Tasdiqlanmoqda...", "success");
+            $("topupStep2").classList.add("hidden");
+            $("topupStep3").classList.remove("hidden");
+        } catch(err) {
+            toast(err.message, "error");
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+function cancelTopup() {
+    if(S.topupTimer) clearInterval(S.topupTimer);
+    if(S.topupPoll) clearInterval(S.topupPoll);
+    closeModal("mTopup");
+}
+
+// ==========================================
+// 9. ADMIN PANEL (TO'LIQ LOGIKA)
+// ==========================================
+async function loadAdminData() {
+    if(!IS_ADMIN) return;
+    try {
+        // 1. Statistika
+        const stat = await api("/api/admin/stats");
+        $("statUsers").innerText = stat.stats.users || 0;
+        $("statRents").innerText = stat.stats.active_rentals || 0;
+        $("statPending").innerText = stat.stats.pending_rentals || 0;
+        $("statBal").innerText = num(stat.stats.total_balance || 0);
+
+        // 2. Kutilayotgan arendalar
+        const rents = await api("/api/admin/rentals/pending");
+        $("pendingRentalsList").innerHTML = rents.rentals.map(r => `
+            <div style="background:var(--surface);padding:14px;border-radius:16px;margin-bottom:10px;border:1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                    <div style="font-weight:700">#${r.account_no} - ${r.first_name}</div>
+                    <div style="font-weight:800;color:var(--blue)">${num(r.price)} so'm</div>
+                </div>
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:10px">
+                    ${new Date(r.start_time).toLocaleString()} dan ${new Date(r.end_time).toLocaleString()} gacha
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <button class="btn btn-success" onclick="adminActionRent(${r.id}, 'approve')" style="padding:8px;font-size:12px">Tasdiqlash</button>
+                    <button class="btn btn-danger" onclick="adminActionRent(${r.id}, 'reject')" style="padding:8px;font-size:12px">Rad etish</button>
+                </div>
+            </div>
+        `).join("") || `<div style="text-align:center;color:var(--text-3);padding:20px">Kutilayotgan arendalar yo'q</div>`;
+
+        // 3. Userlar
+        const users = await api("/api/admin/users");
+        S.admin.users = users.users;
+        renderAdminUsers();
+
+        // 4. Userbot holati
+        checkUserbotStatus();
+
+    } catch(e) { console.error(e); }
+}
+
+function switchAdminTab(tab) {
+    document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
+    event.target.classList.add("active");
+    ["rents", "accs", "users", "userbot"].forEach(t => {
+        $("admin" + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle("hidden", t !== tab);
+    });
+}
+
+async function adminActionRent(id, action) {
+    try {
+        if(action === 'approve') await api("/api/admin/rentals/approve", "POST", { rental_id: id });
+        else await api("/api/admin/rentals/reject", "POST", { rental_id: id, reason: "Admin rad etdi" });
+        toast("Amal bajarildi", "success");
+        loadAdminData();
+    } catch(e) { toast(e.message, "error"); }
+}
+
+function renderAdminUsers(filter = "") {
+    const list = S.admin.users.filter(u =>
+        (u.first_name || "").toLowerCase().includes(filter.toLowerCase()) ||
+        String(u.telegram_id).includes(filter)
+    );
+
+    $("adminUsersList").innerHTML = list.map(u => `
+        <div class="list-item">
+            <div class="list-item-ic" style="background:${u.is_admin ? 'rgba(139,92,246,.15)' : 'var(--surface-2)'};color:${u.is_admin ? '#8B5CF6' : 'var(--text-3)'}">
+                <svg class="ico"><use href="#i-user"/></svg>
+            </div>
+            <div class="list-item-info">
+                <div class="list-item-title">${esc(u.first_name)} ${esc(u.last_name || '')}</div>
+                <div class="list-item-sub">ID: ${u.telegram_id} | Balans: ${num(u.balance)} so'm</div>
+            </div>
+            <div style="display:flex;gap:4px">
+                <button onclick="adminSetBadge(${u.telegram_id}, 'blue')" style="width:24px;height:24px;border-radius:50%;background:#3B82F6;border:none" title="Ko'k galichka"></button>
+                <button onclick="adminSetBadge(${u.telegram_id}, 'none')" style="width:24px;height:24px;border-radius:50%;background:#64748B;border:none" title="Olib tashlash"></button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function searchUsers(val) {
+    renderAdminUsers(val);
+}
+
+async function adminSetBadge(tg_id, badge) {
+    try {
+        await api("/api/admin/user/badge", "POST", { telegram_id: tg_id, badge: badge });
+        toast("Galichka o'zgartirildi", "success");
+        loadAdminData();
+    } catch(e) { toast(e.message, "error"); }
+}
+
+function openAddAccountModal() {
+    $("addAccNo").value = "";
+    $("addAccTitle").value = "";
+    $("addAccDesc").value = "";
+    $("addAccPrices").value = "";
+    openModal("mAddAcc");
+}
+
+async function adminAddAccount() {
+    const no = parseInt($("addAccNo").value);
+    const title = $("addAccTitle").value;
+    const desc = $("addAccDesc").value;
+    let prices = {};
+
+    try { prices = JSON.parse($("addAccPrices").value || '{}'); }
+    catch(e) { toast("Narxlar JSON formati xato!", "error"); return; }
+
+    if(!no || !title) { toast("Raqam va nomini kiriting", "error"); return; }
+
+    try {
+        await api("/api/admin/accounts/add", "POST", {
+            account_no: no, title: title, description: desc, prices: prices
+        });
+        toast("Akkaunt qo'shildi", "success");
+        closeModal("mAddAcc");
+        loadAccounts(); // Asosiy sahifani yangilash
+        loadAdminData();
+    } catch(e) { toast(e.message, "error"); }
+}
+
+// ==========================================
+// 10. USERBOT (AVTO TO'LOV SOZLAMALARI)
+// ==========================================
+async function checkUserbotStatus() {
+    try {
+        const res = await api("/api/admin/userbot/status");
+        const el = $("ubStatus");
+        if(res.connected) {
+            el.innerHTML = `<span style="color:#10B981">✅ Userbot ulangan: @${res.username || res.phone}</span>`;
+            $("ubForm").classList.add("hidden");
+            $("ubCodeForm").classList.add("hidden");
+        } else {
+            el.innerHTML = `<span style="color:#EF4444">❌ Userbot ulanmagan</span>`;
+            $("ubForm").classList.remove("hidden");
+        }
+    } catch(e) { $("ubStatus").innerText = "Xatolik"; }
+}
+
+async function userbotSendCode() {
+    const phone = $("ubPhone").value;
+    if(!phone) return;
+    try {
+        const res = await api("/api/admin/userbot/send-code", "POST", { phone });
+        if(res.ok) {
+            $("ubCodeForm").classList.remove("hidden");
+            toast("Kod yuborildi", "success");
+        } else toast(res.error, "error");
+    } catch(e) { toast(e.message, "error"); }
+}
+
+async function userbotVerifyCode() {
+    const code = $("ubCode").value;
+    if(!code) return;
+    try {
+        const res = await api("/api/admin/userbot/verify-code", "POST", { phone: $("ubPhone").value, code });
+        if(res.ok) {
+            toast("Userbot ulandi!", "success");
+            checkUserbotStatus();
+        } else toast(res.error, "error");
+    } catch(e) { toast(e.message, "error"); }
+}
+
+// ==========================================
+// PASSPORT YUKLASH (PROFIL)
+// ==========================================
+function uploadPassport() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+            try {
+                await api("/api/user/passport", "POST", { passport_img: ev.target.result });
+                toast("Pasport yuborildi, admin tasdiqlashini kuting", "success");
+            } catch(err) { toast(err.message, "error"); }
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+// ==========================================
+// START (Hammasini ishga tushirish)
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    init();
+});
+</script>
+</body>
+</html>
