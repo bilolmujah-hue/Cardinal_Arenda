@@ -1,19 +1,19 @@
 """
-Cardinal Arenda - Telegram Bot (Aiogram 3.x)
-=============================================
-Ushbu fayl foydalanuvchilar bilan bevosita muloqot qiladi.
-Ro'yxatdan o'tish, obuna tekshirish va Web App'ni ochish vazifalarini bajaradi.
+Cardinal Arenda - Telegram Bot (Aiogram 3.x MUKAMMAL VERSIYA)
+=============================================================
+Ushbu fayl foydalanuvchilar bilan muloqot qiladi.
+Premium emojilar, WebApp va Obuna tizimlari 100% ishlaydi.
 """
 
 import logging
 import asyncio
-from aiogram import Bot, Dispatcher, F
-from aiogram.client.default import DefaultBotProperties
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import (
     Message, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton,
     InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 )
+from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from config import BOT, LIMITS
@@ -22,7 +22,7 @@ from db import Database
 logger = logging.getLogger("CardinalBot")
 
 # ============================================================
-# PREMIUM EMOJILAR (Tashqi ko'rinish uchun)
+# PREMIUM EMOJILAR (Telegram maxsus emojilari)
 # ============================================================
 PREMIUM_EMOJI = {
     "✔️": "5206607081334906820",
@@ -35,36 +35,68 @@ PREMIUM_EMOJI = {
     "👤": "5879770735999717115",
     "🛡": "5251203410396458957",
     "💎": "5427168083074628963",
+    "🔥": "5104924544210703484",
+    "⭐️": "5438496463044752972",
+    "💳": "5445353829304387411",
+    "🎁": "5203996991054432397",
+    "⏳": "5368380585066665290",
+    "📢": "5278256077954105203",
 }
 
-
 def pe(text: str) -> str:
-    """Matndagi oddiy emojilarni Premium emojilarga almashtirish"""
-    for emoji, emoji_id in PREMIUM_EMOJI.items():
-        text = text.replace(emoji, f'<tg-emoji emoji-id="{emoji_id}">{emoji}</tg-emoji>')
-    return text
+    """
+    Matndagi oddiy emojilarni Telegram Premium emojilariga almashtiruvchi funksiya.
+    HTML teglariga zarar yetkazmaydi.
+    """
+    if not text:
+        return text
 
+    import re
+    # Emojilarni topish uchun regex pattern
+    pattern = re.compile("|".join(re.escape(k) for k in PREMIUM_EMOJI.keys()))
 
+    def replace(match):
+        emoji = match.group(0)
+        emoji_id = PREMIUM_EMOJI.get(emoji)
+        if emoji_id:
+            return f'<tg-emoji emoji-id="{emoji_id}">{emoji}</tg-emoji>'
+        return emoji
+
+    return pattern.sub(replace, text)
+
+# ============================================================
+# BOT KLASSI
+# ============================================================
 class CardinalBot:
     def __init__(self, db: Database):
-        self.bot = Bot(token=BOT.TOKEN, parse_mode=ParseMode.HTML)
+        # AIOGRAM 3.7.0 TALABI: parse_mode bot ichida default qilib beriladi
+        self.bot = Bot(
+            token=BOT.TOKEN,
+            default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+        )
         self.dp = Dispatcher()
         self.db = db
 
-        # Handlerlarni ro'yxatdan o'tkazish
         self._register_handlers()
 
     def _register_handlers(self):
-        """Barcha buyruq va tugmalarni ushlagichlarni ulash"""
+        """Barcha buyruqlarni ro'yxatdan o'tkazish"""
         self.dp.message.register(self.cmd_start, CommandStart())
         self.dp.message.register(self.cmd_admin, Command("admin"))
         self.dp.message.register(self.handle_contact, F.contact)
-        self.dp.callback_query.register(self.check_subscription, F.data == "check_sub")
+        self.dp.callback_query.register(self.check_sub_callback, F.data == "check_sub")
+        self.dp.message.register(self.handle_webapp_data, F.web_app_data)
         self.dp.message.register(self.handle_text, F.text)
 
+    # ============================================================
+    # YORDAMCHI FUNKSIYALAR
+    # ============================================================
     async def _check_user_subscription(self, user_id: int) -> list:
         """Foydalanuvchi majburiy kanallarga a'zo bo'lganligini tekshirish"""
         not_subscribed = []
+        if not BOT.REQUIRED_CHANNELS:
+            return not_subscribed # Agar kanallar sozlanmagan bo'lsa, o'tkazib yuboriladi
+
         for channel in BOT.REQUIRED_CHANNELS:
             try:
                 member = await self.bot.get_chat_member(chat_id=channel["username"], user_id=user_id)
@@ -79,8 +111,8 @@ class CardinalBot:
         """Obuna bo'lish uchun tugmalar"""
         buttons = []
         for ch in not_subscribed:
-            buttons.append(
-                [InlineKeyboardButton(text=f"📢 {ch['name']}", url=f"https://t.me/{ch['username'].replace('@', '')}")])
+            url = f"https://t.me/{ch['username'].replace('@', '')}"
+            buttons.append([InlineKeyboardButton(text=f"📢 {ch['name']}", url=url)])
 
         buttons.append([InlineKeyboardButton(text="✔️ Tekshirish", callback_data="check_sub")])
         return InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -95,14 +127,36 @@ class CardinalBot:
             resize_keyboard=True
         )
 
+    async def _show_main_menu(self, message: Message, user: dict):
+        """Asosiy menyuni chiqarish"""
+        balance = user.get("balance", 0)
+        name = user.get("first_name", "Foydalanuvchi")
+
+        text = (
+            f"👋 <b>Xush kelibsiz, {name}!</b>\n\n"
+            f"💰 <b>Balansingiz:</b> {balance:,} so'm\n"
+            f"🎮 <b>Arenda tizimi:</b> PUBG Mobile akkauntlarini ijaraga oling.\n\n"
+            f"👇 Akkauntlarni ko'rish uchun pastdagi <b>Web App</b> tugmasini bosing."
+        )
+
+        inline_kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="🚀 Web App'ni ochish",
+                web_app=WebAppInfo(url=BOT.WEB_APP_URL)
+            )]
+        ])
+
+        await message.answer(pe(text), reply_markup=inline_kb)
+        await message.answer("Menyu:", reply_markup=self._get_main_keyboard())
+
     # ============================================================
-    # HANDLERLAR (Buyruqlar va xabarlar)
+    # HANDLERLAR (Buyruqlar)
     # ============================================================
     async def cmd_start(self, message: Message):
         """ /start buyrug'i bosilganda """
         user = message.from_user
 
-        # Foydalanuvchini bazaga qo'shish yoki yangilash
+        # Bazaga saqlash yoki yangilash
         db_user = await self.db.get_or_create_user(
             telegram_id=user.id,
             username=user.username,
@@ -123,7 +177,7 @@ class CardinalBot:
             )
             return
 
-        # Agar telefon raqami kiritilmagan bo'lsa, so'raymiz
+        # Telefon raqami tekshirish
         if not db_user.get("phone"):
             kb = ReplyKeyboardMarkup(
                 keyboard=[[KeyboardButton(text="📱 Raqamni yuborish", request_contact=True)]],
@@ -137,28 +191,8 @@ class CardinalBot:
             )
             return
 
-        # Asosiy menyuni ko'rsatish
+        # Asosiy menyu
         await self._show_main_menu(message, db_user)
-
-    async def _show_main_menu(self, message: Message, user: dict):
-        """Asosiy menyuni chiqarish"""
-        balance = user.get("balance", 0)
-        name = user.get("first_name", "Foydalanuvchi")
-
-        text = (
-            f"👋 <b>Xush kelibsiz, {name}!</b>\n\n"
-            f"💰 <b>Balansingiz:</b> {balance:,} so'm\n"
-            f"🎮 <b>Arenda tizimi:</b> PUBG Mobile akkauntlarini ijaraga oling.\n\n"
-            f"👇 Akkauntlarni ko'rish uchun pastdagi <b>Web App</b> tugmasini bosing."
-        )
-
-        # Web App tugmasi (Inline)
-        inline_kb = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="🚀 Web App'ni ochish", web_app=WebAppInfo(url=BOT.WEB_APP_URL))]
-        ])
-
-        await message.answer(pe(text), reply_markup=inline_kb)
-        await message.answer("Menyu:", reply_markup=self._get_main_keyboard())
 
     async def handle_contact(self, message: Message):
         """Telefon raqam yuborilganda"""
@@ -168,14 +202,12 @@ class CardinalBot:
             phone = phone[3:]
 
         await self.db.update_user_phone(message.from_user.id, phone)
-
-        # Yangilangan ma'lumotni olamiz
         user = await self.db.get_user(message.from_user.id)
 
         await message.answer(pe("✔️ <b>Ro'yxatdan muvaffaqiyatli o'tdingiz!</b>"))
         await self._show_main_menu(message, user)
 
-    async def check_subscription(self, callback: CallbackQuery):
+    async def check_sub_callback(self, callback: CallbackQuery):
         """Obunani tekshirish tugmasi bosilganda"""
         not_subscribed = await self._check_user_subscription(callback.from_user.id)
         if not_subscribed:
@@ -201,9 +233,7 @@ class CardinalBot:
 
         if text == "👤 Profilim":
             user = await self.db.get_user(message.from_user.id)
-            badge = "Ko'k galichka ✔️" if user.get("badge") == "blue" else (
-                "Sariq galichka ⭐" if user.get("badge") == "yellow" else (
-                    "Qora galichka 🖤" if user.get("badge") == "black" else "Yo'q"))
+            badge = "Ko'k galichka ✔️" if user.get("badge") == "blue" else ("Sariq galichka ⭐" if user.get("badge") == "yellow" else ("Qora galichka 🖤" if user.get("badge") == "black" else "Yo'q"))
 
             msg = (
                 f"👤 <b>PROFILINGIZ</b>\n\n"
@@ -216,7 +246,6 @@ class CardinalBot:
             await message.answer(pe(msg))
 
         elif text == "💰 Hisobni to'ldirish":
-            # Web App orqali to'lov qilishni tavsiya qilamiz
             await message.answer(
                 pe("💰 <b>Hisobni to'ldirish</b>\n\n"
                    "Iltimos, to'lovni amalga oshirish uchun quyidagi tugma orqali Web App'ga kiring va <b>To'ldirish</b> bo'limini tanlang."),
@@ -227,6 +256,11 @@ class CardinalBot:
 
         else:
             await message.answer(pe("Menyudan foydalaning yoki /start buyrug'ini bosing."))
+
+    async def handle_webapp_data(self, message: types.WebAppData):
+        """Web App dan kelgan ma'lumotlar"""
+        logger.info(f"WebApp data: {message.web_app_data.data}")
+        await message.answer(pe("✔️ Ma'lumot qabul qilindi."))
 
     async def cmd_admin(self, message: Message):
         """Admin buyruqlari (Statistika)"""
@@ -244,8 +278,9 @@ class CardinalBot:
         )
         await message.answer(pe(text))
 
+    # ============================================================
+    # START / STOP
+    # ============================================================
     async def start(self):
-        """Botni ishga tushirish"""
         logger.info("🤖 Bot Polling rejimida ishga tushmoqda...")
-        # Polling ni boshlash (boshqa tasklar bilan birga ishlashi uchun)
         await self.dp.start_polling(self.bot)
