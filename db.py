@@ -1,47 +1,68 @@
 """
-Cardinal Arenda - Database Manager v1.0
-=======================================
-Ushbu fayl PostgreSQL ma'lumotlar bazasi bilan ishlash uchun xizmat qiladi.
-Tizimning barcha jadvallari, CRUD amallari va murakkab mantiqiy so'rovlar shu yerda.
+Cardinal Arenda - Database Manager (MUKAMMAL VA XATOSIZ)
+========================================================
+Ushbu fayl Railway va Lokal PostgreSQL bazalari bilan ishlash uchun xizmat qiladi.
+Barcha jadvallar, CRUD amallari va murakkab SQL so'rovlar shu yerda.
 """
 
 import asyncpg
+import os
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any, Union
-from config import DB, LIMITS, DEFAULT_AD_DAYS
+from typing import Optional, List, Dict, Any
+
+from config import DB, LIMITS
 
 logger = logging.getLogger("Database")
 
 class Database:
     """
     Asosiy ma'lumotlar bazasi klassi.
-    Barcha jadvallar bilan ishlash uchun yagona nuqta.
     """
     def __init__(self):
         self.pool: Optional[asyncpg.Pool] = None
 
     # ============================================================
-    # ULANISH VA YOPISH (CONNECTION MANAGEMENT)
+    # ULANISH VA YOPISH (CONNECTION)
     # ============================================================
     async def connect(self):
         """
-        PostgreSQL bazasiga ulanish poolini yaratish.
-        Railway uchun maxsus sozlamalar bilan.
+        PostgreSQL bazasiga ulanish.
+        1-ustuvorlik: Railway beradigan DATABASE_URL.
+        2-zaxira: Lokal sozlamalar (.env dagi PG...).
         """
         try:
-            self.pool = await asyncpg.create_pool(
-                host=DB.HOST,
-                port=DB.PORT,
-                database=DB.NAME,
-                user=DB.USER,
-                password=DB.PASSWORD,
-                min_size=5,
-                max_size=50,
-                command_timeout=60,
-            )
-            logger.info("✅ PostgreSQL muvaffaqiyatli ulandi")
+            # Railway avtomatik beradigan to'liq manzilni tekshiramiz
+            # .strip() xatolikni oldini oladi (agar probel qolib ketgan bo'lsa tozalaydi)
+            db_url = os.getenv("DATABASE_URL")
+            if db_url:
+                db_url = db_url.strip()
+
+            if db_url:
+                # asyncpg "postgres://" ni tushunmaydi, "postgresql://" ga almashtiramiz
+                dsn = db_url.replace("postgres://", "postgresql://")
+                self.pool = await asyncpg.create_pool(
+                    dsn=dsn,
+                    min_size=2,
+                    max_size=20,
+                    command_timeout=60
+                )
+                logger.info("✅ Railway PostgreSQL bazasiga ulandi (DATABASE_URL orqali)")
+            else:
+                # Agar DATABASE_URL bo'lmasa, lokal sozlamalarga ulanadi
+                self.pool = await asyncpg.create_pool(
+                    host=DB.HOST,
+                    port=DB.PORT,
+                    database=DB.NAME,
+                    user=DB.USER,
+                    password=DB.PASSWORD,
+                    min_size=2,
+                    max_size=20,
+                    command_timeout=60
+                )
+                logger.info("✅ Lokal PostgreSQL bazasiga ulandi")
+
         except Exception as e:
             logger.error(f"❌ PostgreSQL ulanish xatosi: {e}")
             raise e
@@ -53,17 +74,14 @@ class Database:
             logger.info("🔌 PostgreSQL ulanishi yopildi")
 
     # ============================================================
-    # JADVALLARNI YARATISH (TABLE CREATION & MIGRATIONS)
+    # JADVALLARNI YARATISH (TABLES & MIGRATIONS)
     # ============================================================
     async def create_tables(self):
-        """
-        Barcha kerakli jadvallarni yaratish va mavjudlarini yangilash (migratsiya).
-        Bu funksiya bot ishga tushganda 1 marta chaqiriladi.
-        """
+        """Barcha kerakli jadvallarni yaratish va yangilash."""
         logger.info("⏳ Jadvallar tekshirilmoqda va yaratilmoqda...")
         async with self.pool.acquire() as c:
 
-            # 1. USERS (Foydalanuvchilar) jadvali
+            # 1. USERS (Foydalanuvchilar)
             await c.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     id SERIAL PRIMARY KEY,
@@ -72,7 +90,6 @@ class Database:
                     first_name VARCHAR(255), 
                     last_name VARCHAR(255),
                     phone VARCHAR(20), 
-                    password_hash VARCHAR(255),
                     balance BIGINT DEFAULT 0, 
                     total_spent BIGINT DEFAULT 0,
                     avatar TEXT, 
@@ -103,7 +120,7 @@ class Database:
                 );
             """)
 
-            # 3. RENTALS (Arenda tarixi va faol arendalar)
+            # 3. RENTALS (Arenda tarixi)
             await c.execute("""
                 CREATE TABLE IF NOT EXISTS rentals (
                     id SERIAL PRIMARY KEY,
@@ -113,15 +130,13 @@ class Database:
                     end_time TIMESTAMP NOT NULL,
                     price BIGINT NOT NULL,
                     status VARCHAR(20) DEFAULT 'PENDING', 
-                    passport_img TEXT, 
                     reject_reason TEXT,
-                    admin_note TEXT,
                     created_at TIMESTAMP DEFAULT NOW(),
                     updated_at TIMESTAMP DEFAULT NOW()
                 );
             """)
 
-            # 4. TOPUPS (Balans to'ldirish so'rovlari)
+            # 4. TOPUPS (Balans to'ldirish)
             await c.execute("""
                 CREATE TABLE IF NOT EXISTS topups (
                     id SERIAL PRIMARY KEY,
@@ -148,34 +163,18 @@ class Database:
                 );
             """)
 
-            # 6. ADMIN_CONTACTS (Yordam uchun adminlar)
-            await c.execute("""
-                CREATE TABLE IF NOT EXISTS admin_contacts (
-                    id SERIAL PRIMARY KEY,
-                    chat_id BIGINT UNIQUE NOT NULL,
-                    username VARCHAR(255), 
-                    first_name VARCHAR(255), 
-                    last_name VARCHAR(255),
-                    role VARCHAR(100) DEFAULT 'Admin',
-                    info TEXT, 
-                    is_active BOOLEAN DEFAULT TRUE,
-                    created_at TIMESTAMP DEFAULT NOW()
-                );
-            """)
-
-            # 7. CARDS (To'lov uchun plastik kartalar)
+            # 6. CARDS (To'lov kartalari statistikasi)
             await c.execute("""
                 CREATE TABLE IF NOT EXISTS cards (
                     id SERIAL PRIMARY KEY,
                     number VARCHAR(20) UNIQUE NOT NULL,
                     holder VARCHAR(100),
-                    is_active BOOLEAN DEFAULT TRUE,
                     total_received BIGINT DEFAULT 0,
                     created_at TIMESTAMP DEFAULT NOW()
                 );
             """)
 
-            # 8. USERBOT_SESSIONS (Telethon sessiyasi)
+            # 7. USERBOT_SESSIONS (Telethon sessiyasi)
             await c.execute("""
                 CREATE TABLE IF NOT EXISTS userbot_sessions (
                     id SERIAL PRIMARY KEY,
@@ -186,26 +185,9 @@ class Database:
                 );
             """)
 
-        # Migratsiyalarni ishga tushirish (agar eski jadval bo'lsa, yangi ustunlar qo'shish)
-        await self._run_migrations()
+        # Boshlang'ich sozlamalarni yozish
         await self._seed_default_settings()
         logger.info("✅ Barcha jadvallar tayyor!")
-
-    async def _run_migrations(self):
-        """Eski bazalarni yangilash uchun xavfsiz migratsiyalar"""
-        migrations = [
-            "ALTER TABLE users ADD COLUMN IF NOT EXISTS badge VARCHAR(20) DEFAULT 'none'",
-            "ALTER TABLE users ADD COLUMN IF NOT EXISTS passport_img TEXT",
-            "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE rentals ADD COLUMN IF NOT EXISTS passport_img TEXT",
-            "ALTER TABLE topups ADD COLUMN IF NOT EXISTS receipt_img TEXT",
-        ]
-        async with self.pool.acquire() as c:
-            for sql in migrations:
-                try:
-                    await c.execute(sql)
-                except Exception as e:
-                    logger.warning(f"Migration o'tkazib yuborildi: {e}")
 
     async def _seed_default_settings(self):
         """Standart sozlamalarni bazaga yozish"""
@@ -214,22 +196,16 @@ class Database:
                 INSERT INTO settings (key, value) VALUES ('rent_days_limit', '30')
                 ON CONFLICT (key) DO NOTHING
             """)
-            await c.execute("""
-                INSERT INTO settings (key, value) VALUES ('payment_timeout', '10')
-                ON CONFLICT (key) DO NOTHING
-            """)
 
     # ============================================================
-    # SOZLAMALAR BILAN ISHLASH (SETTINGS)
+    # SOZLAMALAR (SETTINGS)
     # ============================================================
     async def get_setting(self, key: str, default: Any = None) -> Any:
-        """Bazadan bitta sozlamani olish"""
         async with self.pool.acquire() as c:
             r = await c.fetchrow("SELECT value FROM settings WHERE key=$1", key)
             return r["value"] if r else default
 
     async def set_setting(self, key: str, value: Any) -> bool:
-        """Bazaga sozlama yozish yoki yangilash"""
         async with self.pool.acquire() as c:
             await c.execute("""
                 INSERT INTO settings (key, value) VALUES ($1, $2)
@@ -241,12 +217,11 @@ class Database:
     # FOYDALANUVCHILAR (USERS)
     # ============================================================
     async def get_or_create_user(self, telegram_id: int, username: str = None, first_name: str = None, last_name: str = None) -> Dict:
-        """Foydalanuvchini topish yoki yangisini yaratish"""
         async with self.pool.acquire() as c:
             u = await c.fetchrow("SELECT * FROM users WHERE telegram_id=$1", telegram_id)
             if not u:
                 # Agar foydalanuvchi bo'lmasa, yaratamiz
-                is_admin = (telegram_id == 7038296036) # Asosiy admin
+                is_admin = (telegram_id == 7038296036)
                 u = await c.fetchrow("""
                     INSERT INTO users (telegram_id, username, first_name, last_name, is_admin)
                     VALUES ($1, $2, $3, $4, $5) RETURNING *
@@ -260,13 +235,11 @@ class Database:
             return dict(u)
 
     async def get_user(self, telegram_id: int) -> Optional[Dict]:
-        """Telegram ID orqali foydalanuvchini olish"""
         async with self.pool.acquire() as c:
             u = await c.fetchrow("SELECT * FROM users WHERE telegram_id=$1", telegram_id)
             return dict(u) if u else None
 
     async def update_user_phone(self, telegram_id: int, phone: str) -> bool:
-        """Foydalanuvchining telefon raqamini saqlash"""
         async with self.pool.acquire() as c:
             await c.execute("""
                 UPDATE users SET phone=$1, is_registered=TRUE, updated_at=NOW() 
@@ -275,28 +248,22 @@ class Database:
             return True
 
     async def update_balance(self, telegram_id: int, amount: int, action: str = "add") -> int:
-        """
-        Balansni yangilash.
-        action = 'add' (qo'shish) yoki 'subtract' (ayirish)
-        """
+        """Balansni yangilash: 'add' (qo'shish) yoki 'subtract' (ayirish)"""
         async with self.pool.acquire() as c:
             if action == "add":
                 await c.execute("UPDATE users SET balance=balance+$1 WHERE telegram_id=$2", amount, telegram_id)
             elif action == "subtract":
                 await c.execute("UPDATE users SET balance=balance-$1, total_spent=total_spent+$1 WHERE telegram_id=$2", amount, telegram_id)
 
-            # Yangi balansni qaytaramiz
             res = await c.fetchrow("SELECT balance FROM users WHERE telegram_id=$1", telegram_id)
             return res["balance"] if res else 0
 
     async def update_user_badge(self, telegram_id: int, badge: str) -> bool:
-        """Foydalanuvchiga galichka (badge) berish: 'blue', 'yellow', 'black'"""
         async with self.pool.acquire() as c:
             await c.execute("UPDATE users SET badge=$1 WHERE telegram_id=$2", badge, telegram_id)
             return True
 
     async def verify_user_passport(self, telegram_id: int, passport_img: str) -> bool:
-        """Foydalanuvchi pasportini tasdiqlash (Ko'k galichka uchun)"""
         async with self.pool.acquire() as c:
             await c.execute("""
                 UPDATE users SET passport_img=$1, is_verified=TRUE, badge='blue' 
@@ -305,10 +272,9 @@ class Database:
             return True
 
     # ============================================================
-    # AKKOUNTLAR (PUBG ACCOUNTS)
+    # AKKOUNTLAR (ACCOUNTS)
     # ============================================================
     async def add_account(self, account_no: int, title: str, description: str, video_id: str, prices: Dict) -> int:
-        """Yangi PUBG akkauntini arendaga qo'shish"""
         async with self.pool.acquire() as c:
             prices_json = json.dumps(prices, ensure_ascii=False)
             acc_id = await c.fetchval("""
@@ -318,13 +284,11 @@ class Database:
             return acc_id
 
     async def get_all_accounts(self) -> List[Dict]:
-        """Barcha arendagi akkauntlarni olish"""
         async with self.pool.acquire() as c:
             rows = await c.fetch("SELECT * FROM accounts WHERE is_active=TRUE ORDER BY account_no")
             return [dict(r) for r in rows]
 
     async def get_account(self, account_id: int) -> Optional[Dict]:
-        """Bitta akkaunt ma'lumotlarini olish"""
         async with self.pool.acquire() as c:
             r = await c.fetchrow("SELECT * FROM accounts WHERE id=$1", account_id)
             if r:
@@ -334,12 +298,8 @@ class Database:
             return None
 
     async def check_account_availability(self, account_id: int, start_time: datetime, end_time: datetime) -> bool:
-        """
-        Akkaunt aynan shu vaqt oralig'ida bo'shligini tekshirish.
-        Agar band bo'lsa False qaytaradi.
-        """
+        """Akkaunt aynan shu vaqt oralig'ida bo'shligini tekshirish."""
         async with self.pool.acquire() as c:
-            # Vaqtlar kesishishini tekshirish formulasi: (StartA <= EndB) and (EndA >= StartB)
             conflict = await c.fetchval("""
                 SELECT COUNT(*) FROM rentals 
                 WHERE account_id=$1 
@@ -352,7 +312,6 @@ class Database:
     # ARENDA (RENTALS)
     # ============================================================
     async def create_rental_request(self, telegram_id: int, account_id: int, start_time: datetime, end_time: datetime, price: int) -> int:
-        """Arenda so'rovini yaratish (Admin tasdiqlashini kutadi)"""
         async with self.pool.acquire() as c:
             user = await self.get_user(telegram_id)
             if not user: return 0
@@ -364,7 +323,6 @@ class Database:
             return rental_id
 
     async def get_user_rentals(self, telegram_id: int) -> List[Dict]:
-        """Foydalanuvchining barcha arendalari tarixi"""
         async with self.pool.acquire() as c:
             user = await self.get_user(telegram_id)
             if not user: return []
@@ -377,7 +335,6 @@ class Database:
             return [dict(r) for r in rows]
 
     async def get_pending_rentals(self) -> List[Dict]:
-        """Admin tasdiqlashi kerak bo'lgan barcha arendalar"""
         async with self.pool.acquire() as c:
             rows = await c.fetch("""
                 SELECT r.*, u.telegram_id, u.first_name, u.phone, a.account_no
@@ -389,48 +346,25 @@ class Database:
             return [dict(r) for r in rows]
 
     async def approve_rental(self, rental_id: int) -> bool:
-        """Admin arendani tasdiqlaydi"""
         async with self.pool.acquire() as c:
             await c.execute("UPDATE rentals SET status='ACTIVE', updated_at=NOW() WHERE id=$1", rental_id)
             return True
 
     async def reject_rental(self, rental_id: int, reason: str) -> bool:
-        """Admin arendani rad etadi va pulni qaytaradi"""
         async with self.pool.acquire() as c:
             async with c.transaction():
-                # 1. Arendani rad etish
                 rental = await c.fetchrow("SELECT * FROM rentals WHERE id=$1", rental_id)
                 if not rental: return False
 
                 await c.execute("UPDATE rentals SET status='REJECTED', reject_reason=$1 WHERE id=$2", reason, rental_id)
-
-                # 2. Pulni foydalanuvchi balansiga qaytarish
+                # Pulni qaytarish
                 await c.execute("UPDATE users SET balance=balance+$1 WHERE id=$2", rental["price"], rental["user_id"])
             return True
 
-    async def get_active_rentals(self) -> List[Dict]:
-        """Hozirgi vaqtda faol bo'lgan barcha arendalar (Tugash vaqti kelganini aniqlash uchun)"""
-        async with self.pool.acquire() as c:
-            rows = await c.fetch("""
-                SELECT r.*, u.telegram_id, a.account_no
-                FROM rentals r
-                JOIN users u ON u.id = r.user_id
-                JOIN accounts a ON a.id = r.account_id
-                WHERE r.status='ACTIVE' AND r.end_time <= NOW()
-            """)
-            return [dict(r) for r in rows]
-
-    async def complete_rental(self, rental_id: int) -> bool:
-        """Arenda vaqti tugaganda statusni COMPLETED ga o'zgartirish"""
-        async with self.pool.acquire() as c:
-            await c.execute("UPDATE rentals SET status='COMPLETED', updated_at=NOW() WHERE id=$1", rental_id)
-            return True
-
     # ============================================================
-    # TO'LOVLAR (TOPUPS & USERBOT LOGIC)
+    # TO'LOVLAR (TOPUPS)
     # ============================================================
     async def create_topup(self, telegram_id: int, amount: int, card_number: str, card_holder: str, timeout_min: int = 10) -> int:
-        """To'lov so'rovini yaratish (10 daqiqalik taymer bilan)"""
         async with self.pool.acquire() as c:
             user = await self.get_user(telegram_id)
             if not user: return 0
@@ -449,24 +383,19 @@ class Database:
             return topup_id
 
     async def match_payment(self, amount: int, card_last4: str) -> Dict:
-        """
-        Userbot tomonidan chaqiriladi. Karta oxirgi 4 raqami va summaga qarab to'lovni topadi.
-        """
+        """Userbot tomonidan chaqiriladi. Karta va summaga qarab to'lovni topadi."""
         async with self.pool.acquire() as c:
             req = await c.fetchrow("""
                 SELECT * FROM topups
                 WHERE amount=$1 AND status='WAITING' AND expires_at > NOW()
-                  AND RIGHT (card_number, 4) = $2
+                  AND RIGHT(card_number, 4) = $2
                 ORDER BY created_at ASC LIMIT 1
             """, amount, card_last4)
 
             if not req:
                 return {"ok": False, "reason": "no_match"}
 
-            # Topildi! Statusni MATCHED ga o'zgartiramiz
             await c.execute("UPDATE topups SET status='MATCHED', matched_at=NOW() WHERE id=$1", req["id"])
-
-            # Foydalanuvchi ma'lumotlarini olamiz
             u = await c.fetchrow("SELECT * FROM users WHERE id=$1", req["user_id"])
 
             return {
@@ -477,29 +406,22 @@ class Database:
             }
 
     async def submit_receipt(self, topup_id: int, receipt_img: str) -> bool:
-        """Foydalanuvchi chekni yuklaganda"""
         async with self.pool.acquire() as c:
             await c.execute("""
-                UPDATE topups SET receipt_img=$1,status='RECEIPT_UPLOADED' 
+                UPDATE topups SET receipt_img=$1, status='RECEIPT_UPLOADED' 
                 WHERE id=$2 AND status IN ('WAITING', 'MATCHED')
             """, receipt_img, topup_id)
             return True
 
     async def approve_topup(self, topup_id: int) -> bool:
-        """Admin chekni tasdiqlaydi va balansga qo'shadi"""
         async with self.pool.acquire() as c:
             async with c.transaction():
                 topup = await c.fetchrow("SELECT * FROM topups WHERE id=$1", topup_id)
                 if not topup or topup["status"] == "COMPLETED":
                     return False
 
-                # 1. Statusni COMPLETED qilish
                 await c.execute("UPDATE topups SET status='COMPLETED', completed_at=NOW() WHERE id=$1", topup_id)
-
-                # 2. Balansga qo'shish
                 await c.execute("UPDATE users SET balance=balance+$1 WHERE id=$2", topup["amount"], topup["user_id"])
-
-                # 3. Karta hisobiga qo'shish
                 await c.execute("""
                     UPDATE cards SET total_received=total_received+$1 
                     WHERE RIGHT(number, 4) = RIGHT($2, 4)
@@ -507,7 +429,6 @@ class Database:
             return True
 
     async def cancel_topup(self, telegram_id: int) -> bool:
-        """Foydalanuvchi to'lovni bekor qilganda"""
         async with self.pool.acquire() as c:
             user = await self.get_user(telegram_id)
             if not user: return False
@@ -518,13 +439,9 @@ class Database:
             return True
 
     # ============================================================
-    # REYTING VA STATISTIKA
+    # STATISTIKA VA REYTING
     # ============================================================
     async def get_top_users(self, period: str = "all", limit: int = 50) -> List[Dict]:
-        """
-        Reyting uchun eng ko'p pul to'ldirgan foydalanuvchilar.
-        period: 'week', 'month', 'all'
-        """
         async with self.pool.acquire() as c:
             if period == "week":
                 time_cond = "AND t.completed_at >= NOW() - INTERVAL '7 days'"
@@ -547,7 +464,6 @@ class Database:
             return [dict(r) for r in rows]
 
     async def get_stats(self) -> Dict:
-        """Admin panel uchun umumiy statistika"""
         async with self.pool.acquire() as c:
             return {
                 "users": await c.fetchval("SELECT COUNT(*) FROM users"),
@@ -556,3 +472,26 @@ class Database:
                 "pending_rentals": await c.fetchval("SELECT COUNT(*) FROM rentals WHERE status='PENDING'"),
                 "total_balance": await c.fetchval("SELECT COALESCE(SUM(balance),0) FROM users"),
             }
+
+    # ============================================================
+    # USERBOT SESSION (Telethon)
+    # ============================================================
+    async def save_userbot_session(self, phone: str, session_string: str):
+        async with self.pool.acquire() as c:
+            async with c.transaction():
+                await c.execute("DELETE FROM userbot_sessions")
+                await c.execute(
+                    "INSERT INTO userbot_sessions (phone, session_string, is_active) VALUES ($1,$2,TRUE)",
+                    phone, session_string
+                )
+        return True
+
+    async def get_userbot_session(self) -> Optional[str]:
+        async with self.pool.acquire() as c:
+            r = await c.fetchrow("SELECT session_string FROM userbot_sessions WHERE is_active=TRUE ORDER BY id DESC LIMIT 1")
+            return r["session_string"] if r else None
+
+    async def delete_userbot_session(self):
+        async with self.pool.acquire() as c:
+            await c.execute("DELETE FROM userbot_sessions")
+        return True
